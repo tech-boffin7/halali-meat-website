@@ -20,7 +20,7 @@ const quoteFormSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
   phone: z.string().optional(),
   company: z.string().optional(),
-  productInterest: z.string({ required_error: "Please select a product." }).min(1, "Please select a product."),
+  productInterest: z.string().min(1, "Please select a product."),
   quantity: z.string().min(1, "Please specify a quantity (e.g., 1000 kg)."),
   message: z.string().optional(),
 });
