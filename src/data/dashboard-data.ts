@@ -52,6 +52,11 @@ const generateRawQuoteData = (): RawQuoteEntry[] => {
 
 export const rawDailyQuoteData = generateRawQuoteData();
 
+interface AggregatedEntry {
+  name: string;
+  [key: string]: string | number; // Allow string for 'name' and number for other dynamic properties
+}
+
 const aggregateQuoteData = (data: RawQuoteEntry[], granularity: 'month' | 'week' | 'day') => {
   const aggregatedMap = new Map<string, any>();
 
@@ -73,7 +78,7 @@ const aggregateQuoteData = (data: RawQuoteEntry[], granularity: 'month' | 'week'
     }
 
     if (!aggregatedMap.has(key)) {
-      const newEntry: { name: string; [key: string]: number } = { name };
+      const newEntry: AggregatedEntry = { name };
       productIds.forEach(productId => {
         newEntry[`${productId}QuotesCount`] = 0;
         newEntry[`${productId}TotalQuantity`] = 0;
@@ -136,4 +141,3 @@ export const recentMessages = [
     avatar: '/images/avatars/avatar-5.png',
   },
 ];
-
