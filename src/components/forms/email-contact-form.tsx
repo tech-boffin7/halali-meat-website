@@ -29,7 +29,7 @@ const EmailContactForm = () => {
   });
 
   const { register, handleSubmit, formState, reset } = form;
-  const { errors, isSubmitting } = formState;
+  const { isSubmitting } = formState;
 
   const onSubmit = async (values: ContactFormValues) => {
     toast.loading('Sending message...');

@@ -38,7 +38,7 @@ const GetAQuotePage = () => {
   });
 
   const { register, handleSubmit, formState, reset, setValue } = form;
-  const { errors, isSubmitting } = formState;
+  const { isSubmitting } = formState;
 
   const onSubmit = async (values: QuoteFormValues) => {
     toast.loading('Sending quote request...');

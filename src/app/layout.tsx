@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProviderWrapper } from "@/components/theme-provider-wrapper";
-import Header from "@/components/layout/user-header";
 import CookieConsent from "@/components/cookie-consent";
 import { Toaster } from 'sonner';
 import FooterRenderer from '@/components/layout/footer-renderer';

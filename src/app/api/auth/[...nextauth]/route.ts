@@ -1,8 +1,6 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { z } from 'zod';
-import { isAccountLocked, recordFailedLoginAttempt, clearLoginAttempts, getRemainingLockoutTime } from '@/lib/auth-utils';
 
 const authOptions: AuthOptions = {
   providers: [

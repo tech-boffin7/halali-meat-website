@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route"; // Adjust path as needed
+import { authOptions } from "@/lib/authOptions"; // Adjust path as needed
 
 const PRODUCTS_FILE = path.join(process.cwd(), 'src', 'data', 'dynamic-products.json');
 

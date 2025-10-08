@@ -26,7 +26,7 @@ async function writeProducts(products: any[]) {
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: any) {
   const session = await getServerSession(authOptions);
 
   if (!session || (session.user as any).role !== "admin") {

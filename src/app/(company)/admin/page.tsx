@@ -1,12 +1,3 @@
-import Link from 'next/link';
-import {
-  Package,
-  FileText,
-  MessageSquare,
-  CheckCircle,
-  Clock,
-} from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard';
 import { QuotesChart } from '@/components/dashboard/QuotesChart';

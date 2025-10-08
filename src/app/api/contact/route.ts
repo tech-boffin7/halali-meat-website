@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import fs from 'fs/promises';
 import path from 'path';
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route"; // Adjust path as needed
+import { authOptions } from "@/lib/authOptions"; // Adjust path as needed
 
 const CONTACT_MESSAGES_FILE = path.join(process.cwd(), 'src', 'data', 'contact-messages.json');
 

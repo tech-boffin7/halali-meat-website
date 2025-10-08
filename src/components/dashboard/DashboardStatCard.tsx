@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import CountUp from 'react-countup';
 
 import { IconRenderer, ValidIconName } from '@/components/ui/icon-renderer';
