@@ -29,7 +29,7 @@ const EmailContactForm = () => {
   });
 
   const { register, handleSubmit, formState, reset } = form;
-  const { isSubmitting } = formState;
+  const { isSubmitting, errors } = formState;
 
   const onSubmit = async (values: ContactFormValues) => {
     toast.loading('Sending message...');
@@ -46,7 +46,7 @@ const EmailContactForm = () => {
       } else {
         throw new Error('Failed to send message.');
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Failed to send message. Please try again later.');
     } finally {
       toast.dismiss(); // Dismiss loading toast

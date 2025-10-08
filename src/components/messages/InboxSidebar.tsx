@@ -1,4 +1,4 @@
-import { Bell, Home, LineChart, Mail, Package, Package2, Settings, ShoppingCart, Users, Inbox, Send, Archive, Trash2, Tag, RefreshCw } from 'lucide-react';
+import { Bell, Package2, Inbox, Send, Archive, Trash2, Tag, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

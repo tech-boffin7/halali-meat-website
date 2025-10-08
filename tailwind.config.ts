@@ -1,6 +1,7 @@
 
 import type { Config } from "tailwindcss"
 import plugin from "tailwindcss/plugin"
+import tailwindcssAnimate from "tailwindcss-animate"
 
 const config = {
   darkMode: ["class"],
@@ -101,7 +102,7 @@ const config = {
       }
     },
   },
-  plugins: [require("tailwindcss-animate"),
+  plugins: [tailwindcssAnimate,
     plugin(function ({ addUtilities }) {
       addUtilities({
         '.scrollbar-thin': {

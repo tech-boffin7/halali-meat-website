@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Product } from './ProductsShell';
+import { Product } from './types'; // Corrected import path
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
@@ -34,7 +34,7 @@ export function ProductItem({ product, isSelected, onSelect }: ProductItemProps)
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex items-center justify-between">
                     <h3 className="font-semibold truncate">{product.name}</h3>
-                    <Badge variant={product.type === 'Frozen' ? 'secondary' : 'outline'} className="capitalize">
+                    <Badge variant={product.type === 'frozen' ? 'secondary' : 'outline'} className="capitalize">
                         {product.type}
                     </Badge>
                 </div>

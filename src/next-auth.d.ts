@@ -12,4 +12,9 @@ declare module "next-auth" {
     id: string;
     role?: string; // Add role property
   }
+
+  // Extend the User interface
+  interface User {
+    role?: string;
+  }
 }

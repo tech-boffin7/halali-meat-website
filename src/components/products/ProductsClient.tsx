@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { ProductList } from './ProductList';
 import { ProductView } from './ProductView';
 import { useProductFilters } from '@/app/(company)/admin/products/product-filter-context';
+import { Product } from './types';
 
 export function ProductsClient() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);

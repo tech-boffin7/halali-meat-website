@@ -1,20 +1,14 @@
 'use client';
 
 import { usePathname } from 'next/navigation'; // Import usePathname
-import { CircleUser, Menu, Package2, Search, Home, LineChart, Package, ShoppingCart, Users, Inbox } from 'lucide-react';
+import { Menu, Search, Inbox, Package } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Sheet, SheetContent, SheetTrigger, SheetTitle
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils'; // Import cn
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
