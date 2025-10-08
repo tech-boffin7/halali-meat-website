@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "timestamp": "2024-01-15T10:00:00Z",
+    "name": "Alice Johnson",
+    "email": "alice.j@example.com",
+    "phone": "+1234567890",
+    "company": "Global Foods Inc.",
+    "productInterest": "beef",
+    "quantity": "500 kg",
+    "message": "Looking for high-quality beef brisket for our restaurant chain. Please provide your best offer.",
+    "status": "processed"
+  },
+  {
+    "id": "2",
+    "timestamp": "2024-01-14T14:30:00Z",
+    "name": "Bob Williams",
+    "email": "bob.w@example.com",
+    "phone": null,
+    "company": null,
+    "productInterest": "lamb",
+    "quantity": "100 carcasses",
+    "message": "Interested in lamb carcasses for a new import business. What are your lead times?",
+    "status": "processed"
+  },
+  {
+    "id": "3",
+    "timestamp": "2024-01-13T09:15:00Z",
+    "name": "Charlie Brown",
+    "email": "charlie.b@example.com",
+    "phone": "+1122334455",
+    "company": "Meat Distributors LLC",
+    "productInterest": "goat",
+    "quantity": "200 kg",
+    "message": "Need a quote for goat meat, preferably chilled. Urgent request.",
+    "status": "pending"
+  },
+  {
+    "id": "4",
+    "timestamp": "2024-01-12T11:45:00Z",
+    "name": "Diana Prince",
+    "email": "diana.p@example.com",
+    "phone": null,
+    "company": "Wonder Meats",
+    "productInterest": "mutton",
+    "quantity": "75 carcasses",
+    "message": "Regular order for mutton. Please confirm availability and pricing.",
+    "status": "processed"
+  },
+  {
+    "id": "5",
+    "timestamp": "2024-01-11T16:00:00Z",
+    "name": "Eve Adams",
+    "email": "eve.a@example.com",
+    "phone": "+9876543210",
+    "company": null,
+    "productInterest": "beef",
+    "quantity": "1000 kg",
+    "message": "Bulk order for various beef cuts. Can you send a detailed catalog?",
+    "status": "pending"
+  }
+]

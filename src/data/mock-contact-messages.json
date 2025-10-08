@@ -1,0 +1,42 @@
+[
+  {
+    "id": "m1",
+    "timestamp": "2024-09-21T09:00:00Z",
+    "name": "Frank Green",
+    "email": "frank.g@example.com",
+    "message": "I have a question about your halal certification process. Can you provide more details on the auditing bodies you work with?",
+    "status": "unread"
+  },
+  {
+    "id": "m2",
+    "timestamp": "2024-09-20T11:30:00Z",
+    "name": "Grace Hall",
+    "email": "grace.h@email.com",
+    "message": "Your website mentions East Africa. Do you source from specific regions or farms? We are very interested in ethical sourcing.",
+    "status": "read"
+  },
+  {
+    "id": "m3",
+    "timestamp": "2024-09-19T15:00:00Z",
+    "name": "Henry King",
+    "email": "henry.k@mail.com",
+    "message": "I'd like to inquire about partnership opportunities for distribution in the Middle East. Please contact me to discuss further.",
+    "status": "unread"
+  },
+  {
+    "id": "m4",
+    "timestamp": "2024-09-18T10:45:00Z",
+    "name": "Ivy Lee",
+    "email": "ivy.l@domain.com",
+    "message": "Can you provide information on the nutritional value of your beef products? Specifically, I'm looking for grass-fed data.",
+    "status": "read"
+  },
+  {
+    "id": "m5",
+    "timestamp": "2024-09-17T13:15:00Z",
+    "name": "Jack White",
+    "email": "jack.w@web.com",
+    "message": "I encountered an issue with a recent delivery. The packaging was damaged. Please advise on your return policy.",
+    "status": "unread"
+  }
+]
