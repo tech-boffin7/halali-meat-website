@@ -26,10 +26,10 @@ const standards = [
 
 const HalalStandardsPage = () => {
   return (
-    <div className="container mx-auto px-4 py-16 sm:py-24">
-      <div className="text-center mb-16">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">Our Commitment to Halal</h1>
-        <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">Faith, ethics, and quality are at the core of our process.</p>
+    <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold">Our Commitment to Halal</h1>
+        <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">Faith, ethics, and quality are at the core of our process.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-12 items-center mb-24">
@@ -37,27 +37,27 @@ const HalalStandardsPage = () => {
           <Image src="/images/halal-certification.jpg" alt="Halal certification document" layout="fill" objectFit="cover" />
         </div>
         <div className="space-y-6">
-          <h2 className="text-3xl font-bold">The Halal Process</h2>
-          <p className="text-muted-foreground leading-relaxed">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold">The Halal Process</h2>
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
             Halal is more than just a method of slaughter; it is a complete system of ethics and hygiene that governs how an animal is raised, treated, and processed. Our commitment to halal is unwavering, ensuring that every product we export is pure (tayyib) and permissible for consumption.
           </p>
-          <h3 className="text-2xl font-bold pt-4">Certifications & Compliance</h3>
-          <p className="text-muted-foreground leading-relaxed">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-bold pt-4">Certifications & Compliance</h3>
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
             We are certified by leading halal authorities and regularly undergo rigorous audits to maintain our credentials. Our operations comply with both local and international standards, including those recognized by the Gulf Cooperation Council (GCC), to guarantee market access and consumer trust.
           </p>
         </div>
       </div>
 
       <div>
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">The Four Pillars of Halal Slaughter</h2>
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-12">The Four Pillars of Halal Slaughter</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {standards.map((standard, index) => (
             <div key={index} className="p-6 bg-card rounded-lg shadow-sm border border-border/50">
               <div className="flex justify-center items-center mb-4 mx-auto h-16 w-16 rounded-full bg-primary/10">
                 {standard.icon}
               </div>
-              <h3 className="text-lg font-bold mb-2 text-center">{standard.title}</h3>
-              <p className="text-muted-foreground text-sm text-center">{standard.description}</p>
+              <h3 className="text-base sm:text-lg font-bold mb-2 text-center">{standard.title}</h3>
+              <p className="text-sm text-muted-foreground text-center">{standard.description}</p>
             </div>
           ))}
         </div>

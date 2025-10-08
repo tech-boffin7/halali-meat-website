@@ -26,10 +26,10 @@ const services = [
 
 const ServicesPage = () => {
   return (
-    <div className="container mx-auto px-4 py-16 sm:py-24">
-      <div className="text-center mb-16">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold">Our Services</h1>
-        <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">End-to-end solutions for your halal meat import needs.</p>
+    <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold">Our Services</h1>
+        <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">End-to-end solutions for your halal meat import needs.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
@@ -43,8 +43,8 @@ const ServicesPage = () => {
                 {service.icon}
               </div>
               <div>
-                <h3 className="text-lg font-bold">{service.title}</h3>
-                <p className="text-muted-foreground text-sm mt-1">{service.description}</p>
+                <h3 className="text-base sm:text-lg font-bold">{service.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
               </div>
             </div>
           ))}
@@ -59,8 +59,8 @@ const ServicesPage = () => {
                 {service.icon}
               </div>
               <div>
-                <h3 className="text-lg font-bold">{service.title}</h3>
-                <p className="text-muted-foreground text-sm mt-1">{service.description}</p>
+                <h3 className="text-base sm:text-lg font-bold">{service.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{service.description}</p>
               </div>
             </div>
           ))}

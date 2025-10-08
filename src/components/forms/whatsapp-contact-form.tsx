@@ -10,14 +10,14 @@ const WhatsAppContactForm = () => {
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${prefilledMessage}`;
 
   return (
-    <div className="bg-secondary/50 p-8 rounded-lg border border-border/50 w-full flex flex-col items-center justify-center text-center">
-      <h2 className="text-2xl font-bold mb-6">Contact via WhatsApp</h2>
-      <p className="text-muted-foreground mb-6 max-w-md">
+    <div className="bg-secondary/50 p-6 rounded-lg border border-border/50 w-full flex flex-col items-center justify-center text-center">
+      <h2 className="text-xl font-bold mb-4">Contact via WhatsApp</h2>
+      <p className="text-muted-foreground text-sm mb-4 max-w-md">
         Prefer to chat? Click the button below to send us a message directly on WhatsApp.
       </p>
-      <Button asChild size="lg" className="w-full sm:w-auto">
+      <Button asChild size="sm" className="w-full sm:w-auto">
         <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
-          <MessageCircle className="mr-2 h-4 w-4" />
+          <MessageCircle className="mr-2 h-3 w-3" />
           Chat on WhatsApp
         </Link>
       </Button>

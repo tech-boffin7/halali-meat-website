@@ -58,5 +58,17 @@
     "quantity": "1000 kg",
     "message": "Bulk order for various beef cuts. Can you send a detailed catalog?",
     "status": "pending"
+  },
+  {
+    "id": "1759958000188",
+    "timestamp": "2025-10-08T21:13:20.188Z",
+    "name": "Kimani ",
+    "email": "kuzzi735@gmail.com",
+    "phone": "+254 756 222 222",
+    "company": "N/A",
+    "productInterest": "goat",
+    "quantity": "88",
+    "message": "N/A",
+    "status": "pending"
   }
 ]

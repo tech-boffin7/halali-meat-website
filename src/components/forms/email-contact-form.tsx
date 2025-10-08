@@ -54,27 +54,27 @@ const EmailContactForm = () => {
   };
 
   return (
-    <div className="bg-secondary/50 p-8 rounded-lg border border-border/50 w-full">
-      <h2 className="text-2xl font-bold mb-6">Send us an Email</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <div className="bg-secondary/50 p-6 rounded-lg border border-border/50 w-full">
+      <h2 className="text-xl font-bold mb-4">Send us an Email</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-muted-foreground mb-2">Name</label>
+          <label htmlFor="name" className="block text-xs font-medium text-muted-foreground mb-1">Name</label>
           <Input id="name" {...register("name")} placeholder="Your Name" />
-          {errors.name && <p className="text-destructive text-sm mt-1">{errors.name.message}</p>}
+          {errors.name && <p className="text-destructive text-xs mt-1">{errors.name.message}</p>}
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-muted-foreground mb-2">Email</label>
+          <label htmlFor="email" className="block text-xs font-medium text-muted-foreground mb-1">Email</label>
           <Input id="email" type="email" {...register("email")} placeholder="your@email.com" />
-          {errors.email && <p className="text-destructive text-sm mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="text-destructive text-xs mt-1">{errors.email.message}</p>}
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-muted-foreground mb-2">Message</label>
-          <Textarea id="message" {...register("message")} placeholder="How can we help you?" rows={6} />
-          {errors.message && <p className="text-destructive text-sm mt-1">{errors.message.message}</p>}
+          <label htmlFor="message" className="block text-xs font-medium text-muted-foreground mb-1">Message</label>
+          <Textarea id="message" {...register("message")} placeholder="How can we help you?" rows={5} />
+          {errors.message && <p className="text-destructive text-xs mt-1">{errors.message.message}</p>}
         </div>
         <div className="flex items-center justify-between">
-          <Button type="submit" disabled={isSubmitting}>
-            <Send className="mr-2 h-4 w-4" />
+          <Button type="submit" disabled={isSubmitting} size="sm">
+            <Send className="mr-2 h-3 w-3" />
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </Button>
         </div>

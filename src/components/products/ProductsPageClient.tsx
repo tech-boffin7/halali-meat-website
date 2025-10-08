@@ -23,10 +23,10 @@ export function ProductsPageClient({ products }: { products: Product[] }) {
   });
 
   return (
-    <div className="container mx-auto px-4 py-12 md:py-20">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold">Our Products</h1>
-        <p className="mt-4 text-lg text-muted-foreground">Explore our range of premium, 100% halal-certified meat products.</p>
+    <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold">Our Products</h1>
+        <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">Explore our range of premium, 100% halal-certified meat products.</p>
       </div>
 
       <div className="flex justify-center gap-2 mb-10">
@@ -49,7 +49,7 @@ export function ProductsPageClient({ products }: { products: Product[] }) {
               <Badge variant="secondary" className="absolute top-3 right-3">{product.type}</Badge>
             </div>
             <div className="p-5 flex flex-col flex-grow">
-              <h3 className="text-lg font-bold mb-2">{product.name}</h3>
+              <h3 className="text-base sm:text-lg font-bold mb-2">{product.name}</h3>
               <p className="text-muted-foreground text-sm mb-4 flex-grow">{product.description}</p>
               <div className="flex items-center text-primary gap-2 mb-5">
                 <ShieldCheck size={18} />

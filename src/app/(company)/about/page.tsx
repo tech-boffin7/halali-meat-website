@@ -3,26 +3,26 @@ import { CheckCircle } from 'lucide-react';
 
 const AboutPage = () => {
   return (
-    <div className="container mx-auto px-4 py-16 sm:py-24">
-      <div className="text-center mb-16">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold">About Halali Meat Ltd</h1>
-        <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">Connecting the world to premium, ethically sourced halal meat from the heart of Africa.</p>
+    <div className="container mx-auto px-4 py-8 sm:py-12 md:py-16">
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold">About Halali Meat Ltd</h1>
+        <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">Connecting the world to premium, ethically sourced halal meat from the heart of Africa.</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-8">
           <div>
-            <h2 className="text-3xl font-bold mb-4">Our Story</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Our Story</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               Founded on the principles of faith, quality, and reliability, Halali Meat Ltd was born from a desire to share the rich pastoralist heritage of East Africa with the world. We began our journey by partnering with local farmers in Kenya, Tanzania, and Somalia, communities that have perfected the art of raising livestock naturally and sustainably for generations. Our goal is to provide a global market for their premium, grass-fed animals while ensuring strict adherence to halal practices.
             </p>
           </div>
           <div>
-            <h2 className="text-3xl font-bold mb-4">Mission & Vision</h2>
-            <p className="text-muted-foreground leading-relaxed mb-3">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Mission & Vision</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-3">
               <strong className="text-foreground">Mission:</strong> To be the most trusted exporter of premium halal meat, championing ethical sourcing, and delivering unparalleled quality from East Africa to the world.
             </p>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
               <strong className="text-foreground">Vision:</strong> To empower pastoralist communities, promote sustainable agriculture, and become the global benchmark for halal excellence and supply chain transparency.
             </p>
           </div>

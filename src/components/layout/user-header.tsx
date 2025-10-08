@@ -75,9 +75,12 @@ export default function UserHeader() {
             );
           })}
         </nav>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
           <Button asChild className="hidden md:inline-flex text-xs">
             <Link href="/get-a-quote">Get a Quote</Link>
+          </Button>
+          <Button asChild variant="outline" className="hidden md:inline-flex text-xs">
+            <Link href="/login">Admin Login</Link>
           </Button>
           <ThemeSwitcher />
           <div className="md:hidden">
@@ -101,9 +104,14 @@ export default function UserHeader() {
                   {link.label}
                 </Link>
               ))}
-              <Button asChild className="w-full mt-4">
-                <Link href="/get-a-quote">Get a Quote</Link>
-              </Button>
+              <div className="flex items-center space-x-2 pt-4">
+                <Button asChild className="w-full">
+                  <Link href="/get-a-quote">Get a Quote</Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="/login">Admin Login</Link>
+                </Button>
+              </div>
             </nav>
           </motion.div>
         )}
