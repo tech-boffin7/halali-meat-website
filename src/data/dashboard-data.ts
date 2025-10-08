@@ -137,18 +137,3 @@ export const recentMessages = [
   },
 ];
 
-// We need some avatars for the mock data. I'll create placeholder avatars.
-// In a real app, these would be uploaded by users.
-export const createAvatarPlaceholders = () => {
-  const avatars = [
-    { path: 'public/images/avatars/avatar-1.png', color: '#3b82f6' },
-    { path: 'public/images/avatars/avatar-2.png', color: '#10b981' },
-    { path: 'public/images/avatars/avatar-3.png', color: '#f97316' },
-    { path: 'public/images/avatars/avatar-4.png', color: '#8b5cf6' },
-    { path: 'public/images/avatars/avatar-5.png', color: '#ec4899' },
-  ];
-
-  // This is a conceptual function. In a real scenario, you might generate these images.
-  // For now, we'll just assume they exist.
-  console.log('Conceptual: Creating avatar placeholders if they dont exist.');
-};

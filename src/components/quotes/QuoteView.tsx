@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Archive, CheckCircle, Trash2, Reply } from 'lucide-react';
-import { toast } from 'sonner';
 import { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
