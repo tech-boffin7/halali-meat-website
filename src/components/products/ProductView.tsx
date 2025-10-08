@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Edit, Trash2 } from 'lucide-react';
 import { Product } from './types';
+import Image from 'next/image';
 
 import { ArrowLeft } from 'lucide-react';
 
@@ -58,9 +59,11 @@ export function ProductView({ product, onEdit, onDelete, onBack }: ProductViewPr
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
-                <img
+                <Image
                     src={product.image || '/images/placeholder.jpg'}
                     alt={product.name}
+                    width={256}
+                    height={256}
                     className="w-full h-64 object-cover rounded-md mb-4"
                 />
                 <p className="text-sm text-muted-foreground mb-2">

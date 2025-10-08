@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Product } from './ProductsShell';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 interface ProductItemProps {
     product: Product;
@@ -23,10 +24,12 @@ export function ProductItem({ product, isSelected, onSelect }: ProductItemProps)
                 isSelected && 'bg-muted'
             )}
         >
-            <img
+            <Image
                 src={product.image || '/images/placeholder.jpg'}
                 alt={product.name}
-                className="h-16 w-16 rounded-md object-cover"
+                width={64}
+                height={64}
+                className="rounded-md object-cover"
             />
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex items-center justify-between">

@@ -1,6 +1,5 @@
 import { MessageItem } from './MessageItem';
 import { EmptyState } from './EmptyState';
-import { messages } from '@/data/messages';
 
 export function MessageList({ messages, selectedMessage, setSelectedMessage }: { messages: any[], selectedMessage: any, setSelectedMessage: (message: any) => void }) {
   if (messages.length === 0) {
