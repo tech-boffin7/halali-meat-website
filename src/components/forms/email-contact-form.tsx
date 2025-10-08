@@ -46,7 +46,7 @@ const EmailContactForm = () => {
       } else {
         throw new Error('Failed to send message.');
       }
-    } catch (_error) {
+    } catch (_error: any) {
       toast.error('Failed to send message. Please try again later.');
     } finally {
       toast.dismiss(); // Dismiss loading toast

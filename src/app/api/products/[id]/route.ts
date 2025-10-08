@@ -26,7 +26,7 @@ async function writeProducts(products: any[]) {
   }
 }
 
-export async function PUT(request: Request, context: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session || (session.user as any).role !== "admin") {
@@ -34,7 +34,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   }
 
   try {
-    const { id } = context.params;
+    const { id } = params;
     const updatedProductData = await request.json();
 
     if (!updatedProductData.name || !updatedProductData.description || !updatedProductData.type) {
@@ -58,7 +58,7 @@ export async function PUT(request: Request, context: { params: { id: string } })
   }
 }
 
-export async function DELETE(request: Request, context: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
   if (!session || (session.user as any).role !== "admin") {
@@ -66,7 +66,7 @@ export async function DELETE(request: Request, context: { params: { id: string }
   }
 
   try {
-    const { id } = context.params;
+    const { id } = params;
 
     let products = await readProducts();
     const initialLength = products.length;
