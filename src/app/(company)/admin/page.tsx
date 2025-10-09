@@ -63,14 +63,10 @@ const AdminDashboardPage = async () => {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <QuotesChart />
-        <div className="grid gap-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-1">
           <RecentQuotes />
           <RecentMessages />
         </div>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* TopProducts component removed */}
       </div>
     </DashboardShell>
   );

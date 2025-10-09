@@ -14,16 +14,19 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Halali Meat Ltd",
-    template: "%s | Halali Meat Ltd",
+    default: "Halali Meat Ltd.",
+    template: "%s | Halali Meat Ltd.",
   },
   description: "Premium Halal Meat, Exported with Trust. We specialize in sourcing, processing, and exporting high-quality, 100% halal-certified meat from East Africa to the GCC and beyond.",
+  icons: {
+    icon: "/favicon.svg",
+  },
   keywords: ["halal meat", "meat exporter", "beef", "goat", "lamb", "kenya", "tanzania", "somalia", "GCC"],
   openGraph: {
-    title: "Halali Meat Ltd",
+    title: "Halali Meat Ltd.",
     description: "Halal Meat, Exported with Trust.",
     url: "https://halalimeatltd.com",
-    siteName: "Halali Meat Ltd.",
+    siteName: "Halali Meat Ltd..",
     images: [
       {
         url: "https://halalimeatltd.com/og-image.jpg",
@@ -36,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Halali Meat Ltd",
+    title: "Halali Meat Ltd.",
     description: "Halal Meat, Exported with Trust.",
     images: ["https://halalimeatltd.com/twitter-image.jpg"],
   },

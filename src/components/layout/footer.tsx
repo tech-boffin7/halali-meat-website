@@ -45,7 +45,7 @@ export default function Footer() {
 
   return (
     <footer className="bg-secondary/50 border-t border-border/50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4 text-center md:text-left"> {/* Added text-center for mobile */}
             <Link href="/" className="inline-flex items-center justify-center md:justify-start space-x-2"> {/* Adjusted for centering */}
@@ -79,7 +79,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-border/50 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-muted-foreground text-center sm:text-left">
+        <div className="mt-12 border-t border-border p-4 flex flex-col sm:flex-row justify-between items-center text-xs text-muted-foreground text-center sm:text-left">
           <p>&copy; {new Date().getFullYear()} Halali Meat Ltd. All rights reserved.</p>
           <p className="mt-2 sm:mt-0">
             Designed & Developed by | {" "}
