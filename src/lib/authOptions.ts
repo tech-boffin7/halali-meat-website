@@ -19,7 +19,7 @@ export const authOptions: AuthOptions = {
           const { username, password } = parsedCredentials.data;
           // WARNING: This is a temporary, insecure login for development.
           // Replace with a real database check and password hashing.
-          if (username === process.env.ADMIN_USERNAME && password === 'password') {
+          if (username === 'admin' && password === 'password') {
             return {
               id: '1',
               name: 'Admin User',
