@@ -8,7 +8,7 @@ export default function AdminFooter() {
 
   if (isAdminPath) {
     return (
-      <footer className="bg-secondary/50 border-t border-border/50 py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-muted-foreground text-center sm:text-left">
+      <footer className="bg-secondary/50 border-t border-border/50 py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-muted-foreground text-center sm:text-left">
         <p>&copy; {new Date().getFullYear()} Halali Meat Ltd. All rights reserved.</p>
         <p className="mt-2 sm:mt-0">
           Designed & Developed by | {" "}
