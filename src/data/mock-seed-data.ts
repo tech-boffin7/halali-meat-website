@@ -1,4 +1,4 @@
-import { ProductType } from "@prisma/client";
+import { ProductType, Role } from "@prisma/client";
 
 export const mockData = {
     admins: [
@@ -6,16 +6,19 @@ export const mockData = {
             name: "Kuzzi",
             email: "kuzzi@halalimeat.co.ke",
             password: "Kuzzi123!",
+            role: Role.ADMIN,
         },
         {
             name: "Frank",
             email: "frank@halalimeat.co.ke",
             password: "Frank123!",
+            role: Role.ADMIN,
         },
         {
             name: "Halali Admin 3",
             email: "admin3@halalimeat.co.ke",
             password: "Admin123!",
+            role: Role.ADMIN,
         },
     ],
 
