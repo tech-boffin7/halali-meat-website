@@ -1,25 +1,23 @@
 'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { ThemeSwitcher } from "./theme-switcher";
-import { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { DynamicLogo } from "../common/dynamic-logo";
 import { Button } from "../ui/button";
-import { usePathname } from 'next/navigation'; // Added usePathname import
-import { useTheme } from "next-themes"; // Import useTheme
+import { ThemeSwitcher } from "./theme-switcher";
 
-export default function UserHeader() {
+interface UserHeaderProps {
+  lightLogoUrl?: string | null;
+  darkLogoUrl?: string | null;
+}
+
+export default function UserHeader({ lightLogoUrl, darkLogoUrl }: UserHeaderProps = {}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
-  const pathname = usePathname(); // Get current path
-  const { theme } = useTheme(); // Get current theme
-  const [logoSrc, setLogoSrc] = useState("/images/logo/logo-light.png");
-
-  useEffect(() => {
-    setLogoSrc(theme === 'dark' ? '/images/logo/logo-dark.png' : '/images/logo/logo-light.png');
-  }, [theme]);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +50,13 @@ export default function UserHeader() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
         <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Image className="w-20 h-20" src={logoSrc} alt="Halali Meat Ltd Logo" width={120} height={50} />
+            <DynamicLogo 
+              lightLogoUrl={lightLogoUrl}
+              darkLogoUrl={darkLogoUrl}
+              width={120}
+              height={50}
+              className="w-20 h-20"
+            />
           </Link>
         </div>
         <nav className="hidden md:flex items-center space-x-6">

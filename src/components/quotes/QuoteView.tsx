@@ -1,196 +1,267 @@
 'use client';
 
+import { replyToQuote } from '@/app/actions/quote-actions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Archive, CheckCircle, Trash2, Reply } from 'lucide-react';
-import { useState } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-interface Quote {
-  id: string;
-  timestamp: string;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  productInterest: string;
-  quantity: string;
-  message?: string;
-  status: 'pending' | 'processed';
-  isArchived?: boolean;
-}
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { QuoteStatus } from '@prisma/client';
+import { motion } from 'framer-motion';
+import { ArrowLeft, CheckCircle, Clock, MoreVertical, Package, Reply, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { ComposeReplyDialog } from './ComposeReplyDialog';
+import { Quote } from './types';
 
 interface QuoteViewProps {
   quote: Quote;
   onBackClick: () => void;
-  onArchive: (id: string, archive: boolean) => void;
-  onUpdateStatus: (id: string, status: 'processed') => void;
-  onDelete: (id: string) => void;
+  onAction: (action: 'archive' | 'processed' | 'pending' | 'unarchive' | 'trash' | 'read' | 'unread' | 'responded', id: string) => void;
 }
 
-export function QuoteView({ quote, onBackClick, onArchive, onUpdateStatus, onDelete }: QuoteViewProps) {
-  const [isArchiving, setIsArchiving] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+export function QuoteView({ quote, onBackClick, onAction }: QuoteViewProps) {
+  const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
+  const [confirmArchive, setConfirmArchive] = useState(false);
+  const [confirmTrash, setConfirmTrash] = useState(false);
+  const hasMarkedAsRead = useRef(false);
 
-  const handleArchive = async () => {
-    setIsArchiving(true);
-    await onArchive(quote.id, !quote.isArchived);
-    setIsArchiving(false);
+  useEffect(() => {
+    if (quote.status === QuoteStatus.UNREAD && !hasMarkedAsRead.current) {
+      hasMarkedAsRead.current = true;
+      onAction('read', quote.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quote.id, quote.status]);
+
+  useEffect(() => {
+    hasMarkedAsRead.current = false;
+  }, [quote.id]);
+
+  const handleSendReply = useCallback(async (content: string) => {
+    const result = await replyToQuote(quote.id, quote.email, content);
+    if (result.success) {
+      onAction('responded', quote.id);
+      return true;
+    } else {
+      toast.error(result.message);
+      return false;
+    }
+  }, [quote.id, quote.email, onAction]);
+
+  const handleArchiveClick = () => {
+    setConfirmArchive(true);
   };
 
-  const handleMarkAsProcessed = async () => {
-    setIsProcessing(true);
-    await onUpdateStatus(quote.id, 'processed');
-    setIsProcessing(false);
+  const handleArchiveConfirm = async () => {
+    setConfirmArchive(false);
+    await onAction('archive', quote.id);
+    onBackClick();
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    await onDelete(quote.id);
-    setIsDeleting(false);
+  const handleTrashClick = () => {
+    setConfirmTrash(true);
   };
 
-  const handleReply = () => {
-    const subject = encodeURIComponent(`Re: Quote Request - ${quote.productInterest}`);
-    const body = encodeURIComponent(`Dear ${quote.name},
-
-Thank you for your quote request regarding ${quote.productInterest} (${quote.quantity}).
-
-`);
-    window.open(`mailto:${quote.email}?subject=${subject}&body=${body}`, '_blank');
+  const handleTrashConfirm = async () => {
+    setConfirmTrash(false);
+    await onAction('trash', quote.id);
+    onBackClick();
   };
 
-  const isActionDisabled = isArchiving || isProcessing || isDeleting;
+  const handleProcessAction = async () => {
+    await onAction('processed', quote.id);
+  };
+
+  const handlePendingAction = async () => {
+    await onAction('pending', quote.id);
+  };
+
+  const handleUnarchiveAction = async () => {
+    await onAction('unarchive', quote.id);
+    onBackClick();
+  };
 
   return (
-    <div className="flex h-full flex-col rounded-lg border bg-card shadow-sm">
-      <div className="flex items-center p-4">
-        <Button variant="ghost" size="icon" onClick={onBackClick} className="mr-2">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="ml-auto flex items-center gap-2">
-          {/* Desktop Buttons */}
-          <div className="hidden lg:flex lg:gap-2">
-            <Button variant="outline" size="sm" onClick={handleReply} disabled={isActionDisabled}>
-              <Reply className="mr-2 h-4 w-4" /> Reply
+    <>
+      <TooltipProvider>
+        <motion.div
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="flex bg-secondary h-full flex-col"
+        >
+          <div className="flex items-center p-2">
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={onBackClick} data-tooltip="Back">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="sr-only">Back</span>
             </Button>
-            {!quote.isArchived && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleMarkAsProcessed}
-                disabled={quote.status === 'processed' || isActionDisabled}
-              >
-                {isProcessing ? 'Processing...' : <><CheckCircle className="mr-2 h-4 w-4" /> Mark as Processed</>}</Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleArchive}
-              disabled={isActionDisabled}
-            >
-              {isArchiving ? (quote.isArchived ? 'Un-archiving...' : 'Archiving...') : <><Archive className="mr-2 h-4 w-4" /> {quote.isArchived ? 'Un-archive' : 'Archive'}</>}</Button>
-            <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isActionDisabled}>
-              {isDeleting ? 'Deleting...' : <><Trash2 className="mr-2 h-4 w-4" /> Delete</>}</Button>
-          </div>
-
-          {/* Mobile Buttons */}
-          <div className="flex gap-2 lg:hidden">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={handleReply} disabled={isActionDisabled}>
-                    <Reply className="h-4 w-4" />
-                    <span className="sr-only">Reply</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>Reply</p></TooltipContent>
-              </Tooltip>
-              {!quote.isArchived && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleMarkAsProcessed}
-                      disabled={quote.status === 'processed' || isActionDisabled}
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                      <span className="sr-only">Mark as Processed</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent><p>Mark as Processed</p></TooltipContent>
-                </Tooltip>
+            <div className="flex items-center gap-2">
+              {quote.status !== 'ARCHIVED' && (
+                <Button variant="ghost" size="icon" onClick={handleArchiveClick} data-tooltip="Archive">
+                  <Package className="h-4 w-4" />
+                  <span className="sr-only">Archive</span>
+                </Button>
               )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={handleArchive} disabled={isActionDisabled}>
-                    <Archive className="h-4 w-4" />
-                    <span className="sr-only">{quote.isArchived ? 'Un-archive' : 'Archive'}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>{quote.isArchived ? 'Un-archive' : 'Archive'}</p></TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="destructive" size="icon" onClick={handleDelete} disabled={isActionDisabled}>
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">Delete</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent><p>Delete</p></TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
-      </div>
-      <Separator />
-      <div className="flex-1 overflow-y-auto p-4 text-sm">
-        <h2 className="text-sm font-semibold mb-4 w-full bg-secondary py-2 pl-1">Details :</h2>
-        <div className="grid gap-2 p-1">
-          <div className="flex items-center">
-            <div className="font-medium text-sm">From:</div>
-            <div className="ml-2 text-muted-foreground text-sm">{quote.name} &lt;{quote.email}&gt;</div>
-          </div>
-          {quote.company && (
-            <div className="flex items-center">
-              <div className="font-medium text-sm">Company:</div>
-              <div className="ml-2 text-muted-foreground text-sm">{quote.company}</div>
+              
+              <Button variant="ghost" size="icon" onClick={handleTrashClick} data-tooltip="Move to trash">
+                <Trash2 className="h-5 w-5" />
+                <span className="sr-only">Move to trash</span>
+              </Button>
+              <Separator orientation="vertical" className="mx-1 h-6" />
+              <Button variant="ghost" size="icon" onClick={() => setIsReplyDialogOpen(true)} data-tooltip="Reply">
+                <Reply className="h-5 w-5" />
+                <span className="sr-only">Reply</span>
+              </Button>
             </div>
-          )}
-          {quote.phone && (
-            <div className="flex items-center">
-              <div className="font-medium text-sm">Phone:</div>
-              <div className="ml-2 text-muted-foreground text-sm">{quote.phone}</div>
+            <div className="ml-auto flex items-center gap-2">
+              {quote.status === 'PENDING' && (
+                  <Button variant="ghost" size="icon" onClick={handleProcessAction} data-tooltip="Mark as Processed">
+                      <CheckCircle className="h-5 w-5" />
+                      <span className="sr-only">Mark as Processed</span>
+                  </Button>
+              )}
+              {quote.status === 'PROCESSED' && (
+                  <Button variant="ghost" size="icon" onClick={handlePendingAction} data-tooltip="Mark as Pending">
+                      <Clock className="h-5 w-5" />
+                      <span className="sr-only">Mark as Pending</span>
+                  </Button>
+              )}
             </div>
-          )}
-          <div className="flex items-center">
-            <div className="font-medium text-sm">Product Interest:</div>
-            <div className="ml-2 text-muted-foreground text-sm">{quote.productInterest}</div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" data-tooltip="More">
+                  <MoreVertical className="h-5 w-5" />
+                  <span className="sr-only">More</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {(quote.status === 'READ' || quote.status === 'RESPONDED') && (
+                  <DropdownMenuItem onClick={() => onAction('unread', quote.id)}>Mark as unread</DropdownMenuItem>
+                )}
+                {quote.status === 'ARCHIVED' && (
+                  <DropdownMenuItem onClick={handleUnarchiveAction}>Unarchive</DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <div className="flex items-center">
-            <div className="font-medium text-sm">Quantity:</div>
-            <div className="ml-2 text-muted-foreground text-sm">{quote.quantity}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="font-medium text-sm">Status:</div>
-            <div className="ml-2 text-muted-foreground text-sm capitalize">{quote.status}</div>
-          </div>
-          <div className="flex items-center">
-            <div className="font-medium text-sm">Date:</div>
-            <div className="ml-2 text-muted-foreground text-xs">{new Date(quote.timestamp).toLocaleString()}</div>
-          </div>
-        </div>
-        {quote.message && (
-          <div className="mt-4 p-1">
-            <div className="font-medium text-sm">Message:</div>
-            <div className="mt-1 rounded-md border bg-muted/50 p-3 text-muted-foreground text-sm">
+          <Separator />
+          <div className="flex flex-1 flex-col overflow-y-auto scrollbar-thin">
+            <div className="flex items-start p-4">
+              <div className="flex items-start gap-4 text-sm">
+                <Avatar>
+                  <AvatarImage alt={quote.name} />
+                  <AvatarFallback>
+                    {quote.name
+                      .split(' ')
+                      .map((chunk: string) => chunk[0])
+                      .join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="grid gap-1">
+                  <div className="font-semibold">{quote.name}</div>
+                  <div className="line-clamp-1 text-xs">
+                    <span className="font-medium">Email:</span>{" "}
+                    {quote.email}
+                  </div>
+                  <div className="line-clamp-1 text-xs">
+                    <span className="font-medium">Phone:</span>{" "}
+                    {quote.phone}
+                  </div>
+                  {quote.company && (
+                    <div className="line-clamp-1 text-xs">
+                      <span className="font-medium">Company:</span>{" "}
+                      {quote.company}
+                    </div>
+                  )}
+                  {quote.productInterest && (
+                    <div className="line-clamp-1 text-xs">
+                      <span className="font-medium">Product:</span>{" "}
+                      {quote.productInterest}
+                    </div>
+                  )}
+                  {quote.quantity && (
+                    <div className="line-clamp-1 text-xs">
+                      <span className="font-medium">Quantity:</span>{" "}
+                      {quote.quantity}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {quote.createdAt && (
+                <div className="ml-auto text-xs text-muted-foreground">
+                  {new Date(quote.createdAt).toLocaleDateString()}
+                </div>
+              )}
+            </div>
+            <Separator />
+            <div className="flex-1 whitespace-pre-wrap p-4 text-sm">
               {quote.message}
             </div>
+            {quote.replies && quote.replies.length > 0 && (
+              <>
+                <Separator />
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">Replies</h3>
+                  <div className="space-y-4">
+                    {quote.replies.map((reply) => (
+                      <div key={reply.id} className="flex items-start gap-4">
+                        <Avatar>
+                          <AvatarImage alt={reply.user.name} />
+                          <AvatarFallback>
+                            {reply.user.name.split(' ').map((chunk) => chunk[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid gap-1">
+                          <div className="font-semibold">{reply.user.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(reply.createdAt).toLocaleString()}
+                          </div>
+                          <div className="whitespace-pre-wrap text-sm">
+                            {reply.content}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        )}
-      </div>
-    </div>
+        </motion.div>
+      </TooltipProvider>
+
+      <ComposeReplyDialog
+        isOpen={isReplyDialogOpen}
+        onClose={() => setIsReplyDialogOpen(false)}
+        onSendReply={handleSendReply}
+      />
+
+      {/* Confirmation Dialogs */}
+      <ConfirmationDialog
+        isOpen={confirmArchive}
+        onClose={() => setConfirmArchive(false)}
+        onConfirm={handleArchiveConfirm}
+        title="Archive Quote?"
+        description="This quote will be moved to the archived folder. You can restore it later if needed."
+        confirmButtonText="Archive"
+      />
+
+      <ConfirmationDialog
+        isOpen={confirmTrash}
+        onClose={() => setConfirmTrash(false)}
+        onConfirm={handleTrashConfirm}
+        title="Move to Trash?"
+        description="This quote will be moved to trash. You can restore it later or delete it permanently."
+        confirmButtonText="Move to Trash"
+        confirmVariant="destructive"
+      />
+    </>
   );
 }

@@ -3,27 +3,23 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Send } from 'lucide-react';
-import { toast } from 'sonner';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Send } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
-// Define the schema for the contact form
-const contactFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters." }),
-});
+import { contactSchema } from '@/lib/definitions';
 
-type ContactFormValues = z.infer<typeof contactFormSchema>;
+type ContactFormValues = z.infer<typeof contactSchema>;
 
 const EmailContactForm = () => {
   const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
+    resolver: zodResolver(contactSchema),
     defaultValues: {
       name: "",
       email: "",
+      subject: "",
       message: "",
     },
   });
@@ -32,7 +28,7 @@ const EmailContactForm = () => {
   const { isSubmitting, errors } = formState;
 
   const onSubmit = async (values: ContactFormValues) => {
-    toast.loading('Sending message...');
+    const toastId = toast.loading('Sending message...');
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -41,15 +37,13 @@ const EmailContactForm = () => {
       });
 
       if (response.ok) {
-        toast.success('Message sent successfully!');
+        toast.success('Message sent successfully!', { id: toastId });
         reset(); // Reset form fields
       } else {
         throw new Error('Failed to send message.');
       }
-    } catch (_error: any) {
-      toast.error('Failed to send message. Please try again later.');
-    } finally {
-      toast.dismiss(); // Dismiss loading toast
+    } catch { // Removed unused _error parameter
+      toast.error('Failed to send message. Please try again later.', { id: toastId });
     }
   };
 
@@ -66,6 +60,11 @@ const EmailContactForm = () => {
           <label htmlFor="email" className="block text-xs font-medium text-muted-foreground mb-1">Email</label>
           <Input id="email" type="email" {...register("email")} placeholder="your@email.com" />
           {errors.email && <p className="text-destructive text-xs mt-1">{errors.email.message}</p>}
+        </div>
+        <div>
+          <label htmlFor="subject" className="block text-xs font-medium text-muted-foreground mb-1">Subject</label>
+          <Input id="subject" {...register("subject")} placeholder="Subject" />
+          {errors.subject && <p className="text-destructive text-xs mt-1">{errors.subject.message}</p>}
         </div>
         <div>
           <label htmlFor="message" className="block text-xs font-medium text-muted-foreground mb-1">Message</label>

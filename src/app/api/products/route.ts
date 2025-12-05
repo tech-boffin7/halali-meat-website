@@ -1,61 +1,44 @@
-import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { authOptions } from "@/lib/authOptions";
+import { prisma } from '@/lib/db';
+import { productSchema } from '@/lib/definitions';
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions"; // Adjust path as needed
-
-const PRODUCTS_FILE = path.join(process.cwd(), 'src', 'data', 'dynamic-products.json');
-
-// Helper function to read products
-async function readProducts() {
-  try {
-    const data = await fs.readFile(PRODUCTS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading products file:', error);
-    return [];
-  }
-}
-
-// Helper function to write products
-async function writeProducts(products: any[]) {
-  try {
-    await fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2), 'utf8');
-  } catch (error) {
-    console.error('Error writing products file:', error);
-  }
-}
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 export async function GET() {
-  const products = await readProducts();
-  return NextResponse.json(products);
+  try {
+    const products = await prisma.product.findMany();
+    return NextResponse.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session || (session.user as any).role !== "admin") {
+  if (!session || (session.user as any).role !== "ADMIN") {
     return NextResponse.json({ message: "Forbidden: You do not have administrative privileges." }, { status: 403 });
   }
 
   try {
-    const newProduct = await request.json();
+    const body = await request.json();
+    const parsedData = productSchema.parse(body);
 
-    // Basic validation (can be enhanced with Zod)
-    if (!newProduct.name || !newProduct.description || !newProduct.type) {
-      return NextResponse.json({ error: 'Missing required product fields' }, { status: 400 });
-    }
+    const newProduct = await prisma.product.create({
+      data: {
+        ...parsedData,
+        createdById: session.user.id,
+      },
+    });
 
-    const products = await readProducts();
-    const newId = (products.length > 0 ? Math.max(...products.map((p: any) => parseInt(p.id))) : 0) + 1;
-    const productToAdd = { id: newId.toString(), image: '/images/placeholder.jpg', ...newProduct }; // Add a default image
-
-    products.push(productToAdd);
-    await writeProducts(products);
-
-    return NextResponse.json(productToAdd, { status: 201 });
+    return NextResponse.json(newProduct, { status: 201 });
   } catch (error) {
-    console.error('Error adding product:', error);
-    return NextResponse.json({ error: 'Failed to add product' }, { status: 500 });
+    console.error('Error creating product:', error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.flatten().fieldErrors }, { status: 400 });
+    }
+    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 });
   }
 }

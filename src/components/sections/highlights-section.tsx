@@ -1,5 +1,6 @@
 
-import { Globe, ShieldCheck, Leaf, Truck } from 'lucide-react';
+import { Globe, Leaf, ShieldCheck, Truck } from 'lucide-react';
+import { memo } from 'react';
 
 const highlights = [
   {
@@ -24,7 +25,7 @@ const highlights = [
   },
 ];
 
-const HighlightsSection = () => {
+const HighlightsSection = memo(function HighlightsSection() {
   return (
     <section className="py-16 sm:py-24 bg-secondary/50">
       <div className="container mx-auto px-4">
@@ -42,6 +43,6 @@ const HighlightsSection = () => {
       </div>
     </section>
   );
-};
+});
 
 export default HighlightsSection;

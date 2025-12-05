@@ -2,11 +2,13 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-type QuoteStatusFilter = 'all' | 'pending' | 'processed' | 'archived';
+type QuoteStatusFilter = 'ALL' | 'PENDING' | 'RESPONDED' | 'PROCESSED' | 'ARCHIVED';
 
 interface QuoteFilterContextType {
   statusFilter: QuoteStatusFilter;
   setStatusFilter: (filter: QuoteStatusFilter) => void;
+  sortBy: string;
+  setSortBy: (sort: string) => void;
 }
 
 const QuoteFilterContext = createContext<QuoteFilterContextType | undefined>(undefined);
@@ -19,11 +21,12 @@ export function useQuoteFilter() {
   return context;
 }
 
-export function QuoteFilterProvider({ children }: { children: ReactNode }) {
-  const [statusFilter, setStatusFilter] = useState<QuoteStatusFilter>('all');
+export function QuoteFilterProvider({ children, initialStatusFilter }: { children: ReactNode, initialStatusFilter?: QuoteStatusFilter }) {
+  const [statusFilter, setStatusFilter] = useState<QuoteStatusFilter>(initialStatusFilter || 'ALL');
+  const [sortBy, setSortBy] = useState('createdAt_desc');
 
   return (
-    <QuoteFilterContext.Provider value={{ statusFilter, setStatusFilter }}>
+    <QuoteFilterContext.Provider value={{ statusFilter, setStatusFilter, sortBy, setSortBy }}>
       {children}
     </QuoteFilterContext.Provider>
   );

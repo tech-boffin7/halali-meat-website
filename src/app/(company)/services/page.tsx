@@ -1,5 +1,5 @@
+import { Package, Scissors, Search, Ship } from 'lucide-react';
 import Image from 'next/image';
-import { Package, Scissors, Ship, Search } from 'lucide-react';
 
 const services = [
   {
@@ -34,7 +34,7 @@ const ServicesPage = () => {
 
       <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
         <div className="relative h-80 md:h-[500px] w-full rounded-lg overflow-hidden shadow-lg">
-          <Image src="/images/services-logistics.jpg" alt="Logistics and shipping containers" layout="fill" objectFit="cover" />
+          <Image src="/images/services-logistics.jpg" alt="Logistics and shipping containers" fill className="object-cover" />
         </div>
         <div className="space-y-8">
           {services.slice(0, 2).map((service, index) => (
@@ -66,7 +66,7 @@ const ServicesPage = () => {
           ))}
         </div>
         <div className="relative h-80 md:h-[500px] w-full rounded-lg overflow-hidden shadow-lg md:order-1">
-           <Image src="/images/hero-bg.jpg" alt="A processing facility" layout="fill" objectFit="cover" />
+           <Image src="/images/hero-bg.jpg" alt="A processing facility" fill className="object-cover" />
         </div>
       </div>
 

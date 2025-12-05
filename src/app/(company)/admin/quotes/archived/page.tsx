@@ -1,14 +1,15 @@
-import { ArchivedQuotesClient } from '@/components/quotes/ArchivedQuotesClient';
-import { getQuotes } from '@/lib/data-access';
+'use client';
 
-async function getArchivedQuotes() {
-    const allQuotes = await getQuotes();
-    // In a real app, you would fetch only archived quotes from the API
-    return allQuotes.filter((q: any) => q.isArchived);
-}
+import { QuotesClient } from '@/components/quotes/QuotesClient';
+import { useQuotes } from '@/app/(company)/admin/quotes/quotes-context';
+import { useEffect } from 'react';
 
-export default async function AdminArchivedQuotesPage() {
-  const quotes = await getArchivedQuotes();
+export default function ArchivedQuotesPage() {
+  const { setStatusFilter } = useQuotes();
 
-  return <ArchivedQuotesClient initialQuotes={quotes} />;
+  useEffect(() => {
+    setStatusFilter('ARCHIVED');
+  }, [setStatusFilter]);
+
+  return <QuotesClient />;
 }

@@ -2,7 +2,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 import CountUp from 'react-countup';
 
 const stats = [
@@ -12,7 +12,7 @@ const stats = [
   { value: 100, suffix: '%', label: 'Halal Certified' },
 ];
 
-const AnimatedStats = () => {
+const AnimatedStats = memo(function AnimatedStats() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
 
@@ -39,6 +39,6 @@ const AnimatedStats = () => {
       </div>
     </section>
   );
-};
+});
 
 export default AnimatedStats;

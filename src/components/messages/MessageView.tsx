@@ -1,9 +1,14 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { forwardMessage, replyToMessage } from '@/app/actions/message-actions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Archive, Forward, MoreVertical, Reply, ReplyAll, Trash2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,130 +16,180 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Forward, MessageSquare, MoreVertical, Package, Reply, Trash2, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-interface Message {
-  id: string;
-  type: 'inbox' | 'sent' | 'archived';
-  read: boolean;
-  sender: {
-    name: string;
-    email: string;
-  };
-  subject: string;
-  body: string;
-  date: string;
-  labels: string[];
-}
+import { ForwardDialog } from './ForwardDialog';
+import { ReplyDialog } from './ReplyDialog';
+import { ThreadView } from './ThreadView';
+import { Message, MessageType } from './types';
 
 interface MessageViewProps {
   message: Message;
   onBackClick: () => void;
-  onAction: (action: 'archive' | 'trash' | 'unread', id: string) => void;
+  onAction: (action: 'archive' | 'trash' | 'read' | 'unread' | 'unarchive', id: string) => void;
 }
 
 export function MessageView({ message, onBackClick, onAction }: MessageViewProps) {
+  const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
+  const [isForwardDialogOpen, setIsForwardDialogOpen] = useState(false);
+  const [isThreadOpen, setIsThreadOpen] = useState(false);
+  const [confirmArchive, setConfirmArchive] = useState(false);
+  const [confirmTrash, setConfirmTrash] = useState(false);
+  const hasMarkedAsRead = useRef(false);
+
+  useEffect(() => {
+    if (message.type === MessageType.INBOUND && message.status === 'UNREAD' && !hasMarkedAsRead.current) {
+      hasMarkedAsRead.current = true;
+      onAction('read', message.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.id, message.status, message.type]);
+
+  // Reset the ref when viewing a different message
+  useEffect(() => {
+    hasMarkedAsRead.current = false;
+  }, [message.id]);
 
   const handleReply = () => {
-    window.open(`mailto:${message.sender.email}?subject=Re: ${message.subject}`, '_blank');
-  };
-
-  const handleReplyAll = () => {
-    // In a real app, you'd get all recipients
-    window.open(`mailto:${message.sender.email}?subject=Re: ${message.subject}`, '_blank');
+    setIsReplyDialogOpen(true);
   };
 
   const handleForward = () => {
-    const body = encodeURIComponent(`\n\n--- Forwarded message ---\nFrom: ${message.sender.name} <${message.sender.email}>\nDate: ${message.date}\nSubject: ${message.subject}\n\n${message.body}`);
-    window.open(`mailto:?subject=Fwd: ${message.subject}&body=${body}`, '_blank');
+    setIsForwardDialogOpen(true);
+  };
+
+  const handleSendReply = async (content: string) => {
+    // Pass message.id as parentMessageId to link the reply to this thread
+    const result = await replyToMessage(message.email, message.subject, content, message.id);
+    if (result.success) {
+      toast.success('Reply sent successfully!');
+    } else {
+      toast.error(result.message || 'Failed to send reply.');
+    }
+  };
+
+  const handleSendForward = async (recipientEmail: string, content: string) => {
+    // Pass message.id as parentMessageId to track origin
+    const result = await forwardMessage(recipientEmail, message.subject, content, message.id);
+    if (result.success) {
+      toast.success('Forward sent successfully!');
+    } else {
+      toast.error(result.message || 'Failed to send forward.');
+    }
+  };
+
+  const handleArchiveClick = () => {
+    setConfirmArchive(true);
+  };
+
+  const handleArchiveConfirm = async () => {
+    setConfirmArchive(false);
+    await onAction('archive', message.id);
+    onBackClick();
+  };
+
+  const handleTrashClick = () => {
+    setConfirmTrash(true);
+  };
+
+  const handleTrashConfirm = async () => {
+    setConfirmTrash(false);
+    await onAction('trash', message.id);
+    onBackClick();
+  };
+
+  const handleUnarchiveAction = async () => {
+    await onAction('unarchive', message.id);
+    onBackClick();
   };
 
   return (
-    <TooltipProvider>
-      <motion.div
-        initial={{ x: 20, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="flex bg-secondary h-full flex-col"
-      >
-        <div className="flex items-center p-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden" onClick={onBackClick}>
-                <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent><p>Back to messages</p></TooltipContent>
-          </Tooltip>
-          <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={() => onAction('archive', message.id)}>
-                  <Archive className="h-5 w-5" />
+    <>
+      <TooltipProvider>
+        <motion.div
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="flex bg-secondary flex-col h-full"
+        >
+          <div className="flex items-center p-2">
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={onBackClick} data-tooltip="Back">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="sr-only">Back</span>
+            </Button>
+            <div className="flex items-center gap-2">
+              {message.type === MessageType.INBOUND && message.status !== 'ARCHIVED' && (
+                <Button variant="ghost" size="icon" onClick={handleArchiveClick} data-tooltip="Archive">
+                  <Package className="h-4 w-4" />
                   <span className="sr-only">Archive</span>
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Archive</p></TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={() => onAction('trash', message.id)}>
-                  <Trash2 className="h-5 w-5" />
-                  <span className="sr-only">Move to trash</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Move to trash</p></TooltipContent>
-            </Tooltip>
+              )}
+              
+              <Button variant="ghost" size="icon" onClick={handleTrashClick} data-tooltip="Move to trash">
+                <Trash2 className="h-5 w-5" />
+                <span className="sr-only">Move to trash</span>
+              </Button>
             <Separator orientation="vertical" className="mx-1 h-6" />
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleReply}>
-                  <Reply className="h-5 w-5" />
-                  <span className="sr-only">Reply</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Reply</p></TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleReplyAll}>
-                  <ReplyAll className="h-5 w-5" />
-                  <span className="sr-only">Reply all</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Reply all</p></TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={handleForward}>
-                  <Forward className="h-5 w-5" />
-                  <span className="sr-only">Forward</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Forward</p></TooltipContent>
-            </Tooltip>
+            {message.threadId && (
+                <Dialog open={isThreadOpen} onOpenChange={setIsThreadOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" className="gap-2">
+                            <MessageSquare className="h-4 w-4" />
+                            <span className="hidden sm:inline">View Conversation</span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="
+                      w-[calc(100%-20px)] max-h-[calc(100%-20px)]
+                      md:w-full md:h-auto
+                      md:max-w-3xl
+                      rounded-[10px]
+                      p-0 flex flex-col
+                    ">
+                        {/* Mobile header */}
+                        <div className="md:hidden sticky top-0 bg-background border-b px-4 py-3 flex items-center gap-3 z-10">
+                          <Button variant="ghost" size="icon" onClick={() => setIsThreadOpen(false)}>
+                            <X className="h-5 w-5" />
+                          </Button>
+                          <h2 className="font-semibold text-lg">Conversation</h2>
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <ThreadView threadId={message.threadId} onClose={() => setIsThreadOpen(false)} />
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+            {message.type === MessageType.INBOUND && (
+              <Button variant="ghost" size="icon" onClick={handleReply} data-tooltip="Reply">
+                <Reply className="h-5 w-5" />
+                <span className="sr-only">Reply</span>
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" onClick={handleForward} data-tooltip="Forward">
+              <Forward className="h-5 w-5" />
+              <span className="sr-only">Forward</span>
+            </Button>
           </div>
           <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-5 w-5" />
-                    <span className="sr-only">More</span>
-                  </Button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent><p>More options</p></TooltipContent>
-            </Tooltip>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" data-tooltip="More">
+                <MoreVertical className="h-5 w-5" />
+                <span className="sr-only">More</span>
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onAction('unread', message.id)}>Mark as unread</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.info('This feature is not yet implemented.')}>Star thread</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.info('This feature is not yet implemented.')}>Add label</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.info('This feature is not yet implemented.')}>Mute thread</DropdownMenuItem>
+              {message.type === MessageType.INBOUND && message.status !== 'UNREAD' && (
+                <DropdownMenuItem onClick={() => onAction('unread', message.id)}>Mark as unread</DropdownMenuItem>
+              )}
+              {message.status === 'ARCHIVED' && (
+                <DropdownMenuItem onClick={handleUnarchiveAction}>Unarchive</DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -143,26 +198,26 @@ export function MessageView({ message, onBackClick, onAction }: MessageViewProps
           <div className="flex items-start p-4">
             <div className="flex items-start gap-4 text-sm">
               <Avatar>
-                <AvatarImage alt={message.sender.name} />
+                <AvatarImage alt={message.name} />
                 <AvatarFallback>
-                  {message.sender.name
+                  {message.name
                     .split(' ')
                     .map((chunk: string) => chunk[0])
                     .join('')}
                 </AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
-                <div className="font-semibold">{message.sender.name}</div>
+                <div className="font-semibold">{message.name}</div>
                 <div className="line-clamp-1 text-xs">{message.subject}</div>
                 <div className="line-clamp-1 text-xs">
                   <span className="font-medium">Reply-To:</span>{" "}
-                  {message.sender.email}
+                  {message.email}
                 </div>
               </div>
             </div>
-            {message.date && (
+            {message.createdAt && (
               <div className="ml-auto text-xs text-muted-foreground">
-                {new Date(message.date).toLocaleDateString()}
+                {new Date(message.createdAt).toLocaleDateString()}
               </div>
             )}
           </div>
@@ -172,6 +227,42 @@ export function MessageView({ message, onBackClick, onAction }: MessageViewProps
           </div>
         </div>
       </motion.div>
+      <ReplyDialog
+        open={isReplyDialogOpen}
+        onOpenChange={setIsReplyDialogOpen}
+        recipientEmail={message.email}
+        subject={message.subject}
+        originalBody={message.body}
+        onSendReply={handleSendReply}
+      />
+      <ForwardDialog
+        open={isForwardDialogOpen}
+        onOpenChange={setIsForwardDialogOpen}
+        body={message.body}
+        subject={message.subject}
+        onSendForward={handleSendForward}
+      />
     </TooltipProvider>
+
+    {/* Confirmation Dialogs */}
+    <ConfirmationDialog
+      isOpen={confirmArchive}
+      onClose={() => setConfirmArchive(false)}
+      onConfirm={handleArchiveConfirm}
+      title="Archive Message?"
+      description="This message will be moved to the archived folder. You can restore it later if needed."
+      confirmButtonText="Archive"
+    />
+
+    <ConfirmationDialog
+      isOpen={confirmTrash}
+      onClose={() => setConfirmTrash(false)}
+      onConfirm={handleTrashConfirm}
+      title="Move to Trash?"
+      description="This message will be moved to trash. You can restore it later or delete it permanently."
+      confirmButtonText="Move to Trash"
+      confirmVariant="destructive"
+    />
+    </>
   );
 }

@@ -1,38 +1,34 @@
-"use client";
-
-import React, { useState } from 'react';
-import Link from "next/link";
-import Image from "next/image";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User as UserIcon, Menu, X, Home, Package, FileText, MessageSquare } from "lucide-react";
-import { ThemeSwitcher } from "./theme-switcher";
-import { useTheme } from "next-themes";
-import { Session } from "next-auth";
-import { motion, AnimatePresence } from "framer-motion";
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 import { LogoutButton } from '@/components/auth/logout-button';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { useBadgeCounts } from '@/hooks/use-badge-counts';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from "framer-motion";
+import { FileText, Home, Menu, MessageSquare, Package, User as UserIcon, X } from "lucide-react";
+import { Session } from "next-auth";
+import Link from "next/link";
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { DynamicLogo } from "../common/dynamic-logo";
+import { ThemeSwitcher } from "./theme-switcher";
 
 interface AdminHeaderProps {
   session: Session | null;
+  lightLogoUrl?: string | null;
+  darkLogoUrl?: string | null;
 }
 
-export function AdminHeader({ session }: AdminHeaderProps) {
-  const { theme } = useTheme();
+export function AdminHeader({ session, lightLogoUrl, darkLogoUrl }: AdminHeaderProps) {
   const user = session?.user;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
-
-  const logoSrc =
-    theme === "dark"
-      ? "/images/logo/logo-dark.png"
-      : "/images/logo/logo-light.png";
+  const { counts } = useBadgeCounts();
 
   const navItems = [
-    { name: 'Dashboard', href: '/admin', icon: Home },
-    { name: 'Products', href: '/admin/products', icon: Package },
-    { name: 'Quotes', href: '/admin/quotes', icon: FileText },
-    { name: 'Messages', href: '/admin/messages', icon: MessageSquare },
+    { name: 'Dashboard', href: '/admin', icon: Home, badge: null },
+    { name: 'Products', href: '/admin/products', icon: Package, badge: null },
+    { name: 'Quotes', href: '/admin/quotes', icon: FileText, badge: counts.quotes },
+    { name: 'Messages', href: '/admin/messages', icon: MessageSquare, badge: counts.messages },
   ];
 
   return (
@@ -41,12 +37,12 @@ export function AdminHeader({ session }: AdminHeaderProps) {
         <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
           <div className="flex items-center">
             <Link href="/admin" className="flex items-center space-x-2">
-              <Image
-                className="w-20 h-20"
-                src={logoSrc}
-                alt="Halali Meat Ltd Logo"
+              <DynamicLogo 
+                lightLogoUrl={lightLogoUrl}
+                darkLogoUrl={darkLogoUrl}
                 width={120}
                 height={50}
+                className="w-20 h-20"
               />
             </Link>
           </div>
@@ -55,6 +51,12 @@ export function AdminHeader({ session }: AdminHeaderProps) {
             <div className="hidden md:flex items-center space-x-4">
               <ThemeSwitcher />
               <Avatar className="h-10 w-10 border-2 border-primary/50">
+                {user?.image && (
+                  <AvatarImage 
+                    src={user.image} 
+                    alt={user.name || 'User avatar'}
+                  />
+                )}
                 <AvatarFallback className="bg-muted-foreground/20">
                   {user?.name?.[0]?.toUpperCase() ?? <UserIcon size={20} />}
                 </AvatarFallback>
@@ -89,15 +91,27 @@ export function AdminHeader({ session }: AdminHeaderProps) {
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex items-center p-3 rounded-md text-sm font-medium",
+                    "flex items-center justify-between p-3 rounded-md text-sm font-medium",
                     pathname === item.href
                       ? "bg-muted text-foreground"
                       : "text-foreground/80 hover:bg-accent hover:text-foreground"
                   )}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
+                  <div className="flex items-center">
+                    <item.icon className="mr-3 h-5 w-5" />
+                    {item.name}
+                  </div>
+                  {item.badge !== null && item.badge > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="ml-auto"
+                      data-tooltip={`${item.badge} unread ${item.name.toLowerCase()}`}
+                      data-tooltip-position="top"
+                    >
+                      {item.badge}
+                    </Badge>
+                  )}
                 </Link>
               ))}
               <div className="border-t border-border/50 pt-4 mt-4">

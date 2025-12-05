@@ -1,31 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { toast } from 'sonner';
+import * as z from 'zod';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Building, Mail, Phone, Package, Inbox, MessageSquare, Send, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, ArrowRight, Building, Inbox, Mail, Package, Phone, Send, User } from 'lucide-react';
 
-// --- ZOD SCHEMA DEFINITION ---
-const quoteFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters."),
-  email: z.string().email("Please enter a valid email address."),
-  phone: z.string().optional(),
-  company: z.string().optional(),
-  productInterest: z.string().min(1, "Please select a product."),
-  quantity: z.string().min(1, "Please specify a quantity (e.g., 1000 kg)."),
-  message: z.string().optional(),
-});
+import { quoteSchema } from '@/lib/definitions';
 
-type QuoteFormValues = z.infer<typeof quoteFormSchema>;
+type QuoteFormValues = z.infer<typeof quoteSchema>;
 
 const steps = [
   { id: 1, name: 'Contact Info', fields: ['name', 'email', 'phone', 'company'] },
@@ -66,22 +57,44 @@ const Step1_ContactInfo = () => {
 
 const Step2_QuoteDetails = () => {
   const { register, setValue, formState: { errors }, watch } = useFormContext<QuoteFormValues>();
+  const productValue = watch('productInterest');
+  
+  // Check if product was prefilled from URL
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const isProductPrefilled = searchParams?.get('product') === productValue;
+  
   return (
     <div className="space-y-6">
       <div className="relative">
         <Package className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Select name="productInterest" onValueChange={(value) => setValue('productInterest', value)} value={watch('productInterest')}>
-          <SelectTrigger className="pl-10 text-sm sm:text-base">
-            <SelectValue placeholder="Select a product of interest" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="beef">Beef</SelectItem>
-            <SelectItem value="goat">Goat</SelectItem>
-            <SelectItem value="lamb">Lamb</SelectItem>
-            <SelectItem value="mutton">Mutton</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
+        {isProductPrefilled && productValue ? (
+          <>
+            <Input 
+              value={productValue}
+              disabled
+              className="pl-10 text-sm sm:text-base bg-muted cursor-not-allowed"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Product pre-selected from your previous selection. 
+              <a href="/get-a-quote" className="text-primary hover:underline ml-1">
+                Change product?
+              </a>
+            </p>
+          </>
+        ) : (
+          <Select name="productInterest" onValueChange={(value) => setValue('productInterest', value)} value={productValue}>
+            <SelectTrigger className="pl-10 text-sm sm:text-base">
+              <SelectValue placeholder="Select a product of interest" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="beef">Beef</SelectItem>
+              <SelectItem value="goat">Goat</SelectItem>
+              <SelectItem value="lamb">Lamb</SelectItem>
+              <SelectItem value="mutton">Mutton</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
       {errors.productInterest && <p className="text-destructive text-xs sm:text-sm">{errors.productInterest.message}</p>}
 
@@ -122,14 +135,19 @@ const Step3_Review = () => {
 
 export const MultiStepQuoteForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  
+  // Read URL parameters for pre-filling product details
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const productParam = searchParams?.get('product');
+  
   const methods = useForm<QuoteFormValues>({
-    resolver: zodResolver(quoteFormSchema),
+    resolver: zodResolver(quoteSchema),
     defaultValues: {
       name: '',
       email: '',
       phone: '',
       company: '',
-      productInterest: '',
+      productInterest: productParam || '', // Pre-fill if coming from product page
       quantity: '',
       message: '',
     },
@@ -146,13 +164,19 @@ export const MultiStepQuoteForm = () => {
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) throw new Error('Server responded with an error');
+      if (!response.ok) {
+        // Try to parse error message from API response
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error || 'Server responded with an error';
+        throw new Error(errorMessage);
+      }
       
       toast.success('Request sent successfully! We will get back to you shortly.', { id: toastId });
       setCurrentStep(0);
       methods.reset();
     } catch (error) {
-      toast.error('Something went wrong. Please try again.', { id: toastId });
+      const errorMessage = error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+      toast.error(errorMessage, { id: toastId });
     }
   };
 

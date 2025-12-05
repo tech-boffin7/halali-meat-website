@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { memo } from "react";
 
-const HeroSection = () => {
+const HeroSection = memo(function HeroSection() {
     return (
         <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center text-center overflow-hidden">
             <div className="absolute inset-0 z-0 bg-[url('/images/hero-bg.jpg')] bg-cover bg-center md:bg-fixed" />
@@ -39,6 +40,6 @@ const HeroSection = () => {
             </motion.div>
         </section>
     );
-};
+});
 
 export default HeroSection;

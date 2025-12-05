@@ -1,10 +1,14 @@
-import "./globals.css";
+import { getSettings } from "@/app/actions/settings-actions";
+import AuthProvider from '@/components/auth/auth-provider';
+import { DynamicFavicon } from "@/components/common/dynamic-favicon";
+import CookieConsent from "@/components/cookie-consent";
+import FooterRenderer from '@/components/layout/footer-renderer';
+import PageWrapper from "@/components/layout/page-wrapper";
+import { ThemeProviderWrapper } from "@/components/theme-provider-wrapper";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ThemeProviderWrapper } from "@/components/theme-provider-wrapper";
-import CookieConsent from "@/components/cookie-consent";
 import { Toaster } from 'sonner';
-import FooterRenderer from '@/components/layout/footer-renderer';
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -56,9 +60,11 @@ export const metadata: Metadata = {
   },
 };
 
-import AuthProvider from '@/components/auth/auth-provider'; // Import AuthProvider
-
-import PageWrapper from "@/components/layout/page-wrapper";
+async function FaviconProvider() {
+  const result = await getSettings().catch(() => ({ success: false, settings: null }));
+  const faviconUrl = result.success && result.settings ? result.settings.faviconUrl : null;
+  return <DynamicFavicon faviconUrl={faviconUrl} />;
+}
 
 export default function RootLayout({
   children,
@@ -68,7 +74,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
-        <AuthProvider> {/* Wrap with AuthProvider */}
+        <FaviconProvider />
+        <AuthProvider>
           <ThemeProviderWrapper
             attribute="class"
             defaultTheme="system"

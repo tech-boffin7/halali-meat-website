@@ -1,11 +1,12 @@
 
-import Link from 'next/link';
-import { products } from '@/data/products';
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { products } from '@/data/products';
+import Image from 'next/image';
+import Link from 'next/link';
+import { memo } from 'react';
 
-const ProductsPreview = () => {
+const ProductsPreview = memo(function ProductsPreview() {
   const previewProducts = products.slice(0, 4);
 
   return (
@@ -20,12 +21,11 @@ const ProductsPreview = () => {
             <div key={product.id} className="bg-card border border-border/50 rounded-lg overflow-hidden shadow-sm hover:shadow-md hover:border-border transition-all duration-300 flex flex-col group">
               <div className="relative h-60 w-full overflow-hidden">
                 <Image 
-                  src={product.image || '/images/placeholder.jpg'} 
-                  alt={product.name} 
-                  layout="fill" 
-                  objectFit="cover" 
-                  className="group-hover:scale-105 transition-transform duration-300"
-                />
+                src={product.image || '/images/placeholder.jpg'} 
+                alt={product.name} 
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
+              />
                 <Badge variant="secondary" className="absolute top-3 right-3">{product.type}</Badge>
               </div>
               <div className="p-5 flex flex-col flex-grow">
@@ -46,6 +46,6 @@ const ProductsPreview = () => {
       </div>
     </section>
   );
-};
+});
 
 export default ProductsPreview;

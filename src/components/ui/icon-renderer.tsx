@@ -1,12 +1,15 @@
 'use client';
 
 import {
-  Package,
-  FileText,
-  MessageSquare,
-  CheckCircle,
-  Clock,
-  LucideProps,
+    AlertCircle,
+    CheckCircle,
+    Clock,
+    FileText,
+    LucideProps,
+    Mail,
+    MessageSquare,
+    Package,
+    TrendingUp,
 } from 'lucide-react';
 
 export const icons = {
@@ -15,6 +18,9 @@ export const icons = {
   MessageSquare,
   CheckCircle,
   Clock,
+  Mail,
+  AlertCircle,
+  TrendingUp,
 };
 
 export type ValidIconName = keyof typeof icons;

@@ -1,46 +1,50 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Product } from './types'; // Corrected import path
-import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { memo } from 'react';
+import { Product } from './types';
 
 interface ProductItemProps {
-    product: Product;
-    isSelected: boolean;
-    onSelect: () => void;
+  product: Product;
+  isSelected: boolean;
+  onSelect: (product: Product) => void;
 }
 
-export function ProductItem({ product, isSelected, onSelect }: ProductItemProps) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            onClick={onSelect}
-            className={cn(
-                'flex items-start gap-4 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent cursor-pointer',
-                isSelected && 'bg-muted'
-            )}
-        >
-            <Image
-                src={product.image || '/images/placeholder.jpg'}
-                alt={product.name}
-                width={64}
-                height={64}
-                className="rounded-md object-cover"
-            />
-            <div className="flex flex-col gap-1 w-full">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold truncate">{product.name}</h3>
-                    <Badge variant={product.type === 'frozen' ? 'secondary' : 'outline'} className="capitalize">
-                        {product.type}
-                    </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground">{product.category}</p>
-                <p className="line-clamp-2 text-xs text-muted-foreground">{product.description}</p>
-            </div>
-        </motion.div>
-    );
-}
+export const ProductItem = memo(function ProductItem({ 
+  product, 
+  isSelected, 
+  onSelect 
+}: ProductItemProps) {
+  return (
+    <li
+      onClick={() => onSelect(product)}
+      className={cn(
+        'p-4 cursor-pointer hover:bg-muted/50 transition-colors',
+        isSelected && 'bg-muted'
+      )}
+    >
+      <div className="flex items-center gap-4">
+        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded border bg-muted">
+          <Image
+            src={product.imageUrl || '/images/placeholder.jpg'}
+            alt={product.name}
+            fill
+            unoptimized
+            className="object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = '/images/placeholder.jpg';
+            }}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm truncate">{product.name}</p>
+          <p className="text-xs text-muted-foreground truncate">
+            {product.category} - {product.type}
+          </p>
+        </div>
+      </div>
+    </li>
+  );
+});

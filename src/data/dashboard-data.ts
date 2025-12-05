@@ -1,4 +1,3 @@
-
 import { format, startOfWeek, addDays, getWeek } from 'date-fns';
 import { products } from './products'; // Import products to get IDs
 import mockQuotes from './mock-quotes.json'; // Import mock quotes
@@ -22,7 +21,7 @@ interface RawQuoteEntry {
 
 const generateRawQuoteData = (): RawQuoteEntry[] => {
   const data: RawQuoteEntry[] = [];
-  mockQuotes.forEach(quote => {
+  (mockQuotes as any[]).forEach(quote => {
     const productId = productMap.get(quote.productInterest);
     if (productId) {
       data.push({

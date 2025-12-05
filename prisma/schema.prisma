@@ -1,0 +1,216 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  email               String    @unique
+  password            String
+  image               String?
+  role                Role      @default(ADMIN)
+  createdAt           DateTime  @default(now())
+  
+  // Relations
+  products            Product[]
+  replies             Reply[]
+  messages            Message[]
+  settings            Settings?
+  
+  // Security
+  lastPasswordChange  DateTime?
+  loginAttempts       Int?      @default(0)
+  lockedUntil         DateTime?
+  
+  // Email Verification
+  emailVerificationCode    String?
+  emailVerificationExpires DateTime?
+}
+
+model Product {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Float
+  category    String
+  type        ProductType
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String?  @db.ObjectId
+  createdBy   User? @relation(fields: [createdById], references: [id])
+  
+  @@index([category])
+  @@index([type])
+  @@index([createdAt])
+  @@index([category, type])
+}
+
+model Quote {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String
+  phone           String
+  company         String?     // Optional company name
+  productInterest String?     // Product customer is interested in (optional for migration)
+  quantity        String?     // Requested quantity (optional for migration)
+  message         String
+  status          QuoteStatus @default(UNREAD)
+  createdAt       DateTime    @default(now())
+  replies         Reply[]     @relation("QuoteReplies")
+  
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+  @@index([status, createdAt])
+}
+
+model Reply {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+  quoteId   String   @db.ObjectId
+  quote     Quote    @relation("QuoteReplies", fields: [quoteId], references: [id])
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  subject   String
+  body      String
+  status    MessageStatus @default(UNREAD)
+  type      MessageType @default(INBOUND)
+  createdAt DateTime @default(now())
+  userId    String?  @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  
+  // Threading: Group related messages (replies/forwards)
+  threadId      String?   @db.ObjectId
+  parentMessageId String? @db.ObjectId
+  parentMessage Message?  @relation("MessageThread", fields: [parentMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies       Message[] @relation("MessageThread")
+  
+  // Scheduling: Send messages at future time
+  scheduledFor  DateTime?
+  sentAt        DateTime?
+  
+  // Attachments: File uploads
+  attachments   Attachment[]
+  
+  @@index([type, status])
+  @@index([threadId])
+  @@index([createdAt])
+  @@index([scheduledFor])
+  @@index([status, type])
+}
+
+model Attachment {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId   String   @db.ObjectId
+  message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  filename    String
+  fileUrl     String
+  fileSize    Int      // bytes
+  mimeType    String
+  uploadedAt  DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+}
+
+enum QuoteStatus {
+  UNREAD
+  READ
+  PENDING
+  RESPONDED
+  PROCESSED
+  ARCHIVED
+  TRASH
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+  TRASH
+  SCHEDULED  // For scheduled messages not yet sent
+  SENT       // For successfully sent scheduled messages
+}
+
+enum MessageType {
+  INBOUND
+  OUTBOUND
+}
+
+enum ProductType {
+  CHILLED
+  FROZEN
+}
+
+model Settings {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                String   @unique @db.ObjectId
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Company Settings
+  companyName           String?
+  companyEmail          String?
+  companyPhone          String?
+  companyAddress        String?
+  companyLogoUrl        String?
+  companyLogoDarkUrl    String?
+  companyWebsite        String?
+  faviconUrl            String?
+  
+  // Email Settings
+  smtpHost              String?
+  smtpPort              Int?     @default(587)
+  smtpUser              String?
+  smtpPassword          String?  // Encrypted
+  smtpFromEmail         String?
+  smtpFromName          String?
+  emailSignature        String?
+
+  // Integration Settings
+  cloudinaryCloudName   String?
+  cloudinaryApiKey      String?
+  cloudinaryApiSecret   String?  // Encrypted
+  
+  // Notification Preferences
+  emailNotifications    Boolean  @default(true)
+  quoteNotifications    Boolean  @default(true)
+  messageNotifications  Boolean  @default(true)
+  productNotifications  Boolean  @default(false)
+  
+  // Application Preferences
+  defaultProductView    String?  @default("grid") // "grid" or "list"
+  itemsPerPage          Int?     @default(12)
+  timezone              String?  @default("Africa/Nairobi")
+  dateFormat            String?  @default("DD/MM/YYYY")
+  
+  // Security Settings
+  twoFactorEnabled      Boolean  @default(false)
+  sessionTimeout        Int?     @default(3600) // seconds
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model QuoteTemplate {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  content   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

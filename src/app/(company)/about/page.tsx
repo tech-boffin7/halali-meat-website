@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import { CheckCircle } from 'lucide-react';
+import Image from 'next/image';
 
 const AboutPage = () => {
   return (
@@ -28,7 +28,7 @@ const AboutPage = () => {
           </div>
         </div>
         <div className="relative h-80 md:h-[500px] w-full rounded-lg overflow-hidden shadow-lg">
-          <Image src="/images/about-farm.jpg" alt="Lush pastures of an East African farm" layout="fill" objectFit="cover" />
+          <Image src="/images/about-farm.jpg" alt="Lush pastures of an East African farm" fill className="object-cover" />
         </div>
       </div>
 

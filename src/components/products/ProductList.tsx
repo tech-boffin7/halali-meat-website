@@ -1,10 +1,9 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { Product } from './types';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import Image from 'next/image';
+import { ProductItem } from './ProductItem';
+import { Product } from './types';
 
 interface ProductListProps {
     products: Product[];
@@ -31,28 +30,12 @@ export function ProductList({ products, selectedProduct, onSelectProduct, onAddP
             <div className="flex-1 overflow-y-auto">
                 <ul className="divide-y divide-border border-b">
                     {products.map((product) => (
-                        <li
+                        <ProductItem
                             key={product.id}
-                            onClick={() => onSelectProduct(product)}
-                            className={cn(
-                                'p-4 cursor-pointer hover:bg-muted/50',
-                                selectedProduct?.id === product.id && 'bg-muted'
-                            )}
-                        >
-                            <div className="flex items-center gap-4">
-                                <Image
-                                    src={product.image || '/images/placeholder.jpg'}
-                                    alt={product.name}
-                                    width={40}
-                                    height={40}
-                                    className="rounded-md object-cover h-10 w-10"
-                                />
-                                <div className="flex-1">
-                                    <p className="font-semibold text-sm">{product.name}</p>
-                                    <p className="text-xs text-muted-foreground">{product.category} - {product.type}</p>
-                                </div>
-                            </div>
-                        </li>
+                            product={product}
+                            isSelected={selectedProduct?.id === product.id}
+                            onSelect={onSelectProduct}
+                        />
                     ))}
                 </ul>
             </div>

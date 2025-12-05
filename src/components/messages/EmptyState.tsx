@@ -1,10 +1,26 @@
-export function EmptyState() {
+interface EmptyStateProps {
+  searchQuery?: string;
+  statusFilter?: string;
+}
+
+export function EmptyState({ searchQuery, statusFilter }: EmptyStateProps) {
+  let title = "You have no messages";
+  let description = "You can start a new conversation here.";
+
+  if (searchQuery) {
+    title = `No messages found for "${searchQuery}"`;
+    description = "Try adjusting your search or filters.";
+  } else if (statusFilter && statusFilter !== 'ALL') {
+    title = `No ${statusFilter.toLowerCase()} messages`;
+    description = "Check other message categories or filters.";
+  }
+
   return (
     <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">
       <div className="flex flex-col items-center gap-1 text-center">
-        <h3 className="text-2xl font-bold tracking-tight">You have no messages</h3>
+        <h3 className="text-2xl font-bold tracking-tight">{title}</h3>
         <p className="text-sm text-muted-foreground">
-          You can start a new conversation here.
+          {description}
         </p>
       </div>
     </div>

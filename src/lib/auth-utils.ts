@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 // In-memory store for failed login attempts and lockout status
 // NOTE: For a production environment, this should be replaced with a persistent store (e.g., Redis, database)
@@ -45,20 +46,19 @@ export function recordFailedLoginAttempt() {
   }
 }
 
-export function clearLoginAttempts() {
-  delete loginAttempts[ADMIN_KEY];
+export function clearAdminLoginAttempts() {
   delete lockoutStatus[ADMIN_KEY];
-  console.log('Admin login attempts cleared.');
+  logger.info('Admin login attempts cleared');
 }
 
 export function isAccountLocked(): boolean {
   const status = lockoutStatus[ADMIN_KEY];
   if (status && Date.now() < status.lockedUntil) {
-    console.warn(`Admin account is locked. Try again after ${new Date(status.lockedUntil).toLocaleTimeString()}`);
+    logger.warn(`Admin account is locked. Try again after ${new Date(status.lockedUntil).toLocaleTimeString()}`);
     return true;
   } else if (status && Date.now() >= status.lockedUntil) {
     // Lockout period expired, clear status
-    clearLoginAttempts();
+    clearAdminLoginAttempts();
   }
   return false;
 }

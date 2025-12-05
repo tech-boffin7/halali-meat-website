@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,9 +10,10 @@ import { toast } from 'sonner';
 import { Loader2, User, Lock } from 'lucide-react';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter(); // Get router instance
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +22,7 @@ const LoginPage = () => {
 
     const result = await signIn('credentials', {
       redirect: false, // Handle redirect manually to show toasts
-      username,
+      email,
       password,
     });
 
@@ -28,15 +30,28 @@ const LoginPage = () => {
     toast.dismiss(toastId);
 
     if (result?.error) {
-      toast.error('Login Failed', {
-        description: 'Invalid username or password. Please try again.',
+      let errorMessage = 'Login Failed';
+      let errorDescription = 'An unexpected error occurred. Please try again.';
+
+      if (result.error === 'UserNotFound') {
+        errorDescription = 'No account found with that email address.';
+      } else if (result.error === 'IncorrectPassword') {
+        errorDescription = 'Incorrect password. Please try again.';
+      } else if (result.error === 'CredentialsSignin') {
+        errorDescription = 'Invalid email or password. Please try again.';
+      } else if (result.error === 'TooManyRequests') {
+        errorDescription = 'Too many login attempts. Please try again later.';
+      }
+
+      toast.error(errorMessage, {
+        description: errorDescription,
       });
     } else if (result?.ok) {
       toast.success('Login Successful', {
         description: 'Redirecting you to the admin dashboard...',
       });
-      // Manually redirect after success toast
-      window.location.href = '/admin';
+      // Use router.push for client-side navigation
+      router.push('/admin');
     }
   };
 
@@ -52,11 +67,11 @@ const LoginPage = () => {
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
-                id="username"
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="pl-10"
               />

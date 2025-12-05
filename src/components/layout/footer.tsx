@@ -1,12 +1,15 @@
 'use client';
 
+import { Facebook, Instagram, Twitter } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import { Facebook, Twitter, Instagram } from "lucide-react";
-import { useTheme } from "next-themes";
+import { DynamicLogo } from "../common/dynamic-logo";
 
-export default function Footer() {
-  const { theme } = useTheme();
+interface FooterProps {
+  lightLogoUrl?: string | null;
+  darkLogoUrl?: string | null;
+}
+
+export default function Footer({ lightLogoUrl, darkLogoUrl }: FooterProps = {}) {
 
   const socialLinks = [
     { icon: <Facebook size={20} />, href: "#" },
@@ -41,15 +44,18 @@ export default function Footer() {
     },
   ];
 
-  const logoSrc = theme === "dark" ? "/images/logo/logo-dark.png" : "/images/logo/logo-light.png";
-
   return (
     <footer className="bg-secondary/50 border-t border-border/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4 text-center md:text-left"> {/* Added text-center for mobile */}
-            <Link href="/" className="inline-flex items-center justify-center md:justify-start space-x-2"> {/* Adjusted for centering */}
-              <Image src={logoSrc} alt="Halali Meat Ltd Logo" width={120} height={50} />
+          <div className="space-y-4 text-center md:text-left">
+            <Link href="/" className="inline-flex items-center justify-center md:justify-start space-x-2">
+              <DynamicLogo 
+                lightLogoUrl={lightLogoUrl}
+                darkLogoUrl={darkLogoUrl}
+                width={120}
+                height={50}
+              />
             </Link>
             <p className="text-xs text-muted-foreground mx-auto max-w-xs md:mx-0"> {/* Added mx-auto for centering */}
               Premium Halal Meat, Exported with Trust.

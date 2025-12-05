@@ -1,12 +1,13 @@
 'use client';
 
-import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { MessageCircle } from 'lucide-react';
+import Link from 'next/link';
 
 const WhatsAppContactForm = () => {
-  const phoneNumber = '+254123456789'; // Replace with your WhatsApp number
-  const prefilledMessage = encodeURIComponent('Hello, I would like to inquire about your Halali Meat products.');
+  const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+254123456789';
+  const defaultMessage = process.env.NEXT_PUBLIC_WHATSAPP_MESSAGE || 'Hello, I would like to inquire about your Halali Meat products.';
+  const prefilledMessage = encodeURIComponent(defaultMessage);
   const whatsappLink = `https://wa.me/${phoneNumber}?text=${prefilledMessage}`;
 
   return (
