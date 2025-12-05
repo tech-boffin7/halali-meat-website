@@ -1,0 +1,17 @@
+name: Process Scheduled Messages
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Cron Endpoint
+        run: |
+          curl -X GET ${{ secrets.APP_URL }}/api/cron/process-messages \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          --fail

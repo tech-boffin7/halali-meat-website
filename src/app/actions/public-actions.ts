@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db';
 import { contactSchema, quoteSchema } from '@/lib/definitions';
+import { sendEmail } from '@/lib/email-service';
 import { sendMessageNotification, sendQuoteNotification } from '@/lib/notification-service';
 import { ratelimit } from '@/lib/ratelimit';
 import { headers } from 'next/headers';
