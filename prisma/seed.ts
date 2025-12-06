@@ -12,6 +12,18 @@ async function main() {
   console.log("🌱 Starting database seeding...\n");
 
   try {
+    // ==================== CLEANUP ====================
+    console.log("🧹 Clearing existing data...");
+    await prisma.settings.deleteMany();
+    await prisma.attachment.deleteMany();
+    await prisma.message.deleteMany();
+    await prisma.reply.deleteMany();
+    await prisma.quote.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.quoteTemplate.deleteMany();
+    console.log("   ✓ Database cleared\n");
+
     // ==================== USERS (ADMINS) ====================
     console.log("👥 Seeding users...");
     for (const admin of mockData.admins) {
@@ -33,27 +45,27 @@ async function main() {
 
     // ==================== QUOTES ====================
     console.log("💬 Seeding quotes...");
-    
+
     // Initial quotes from mock data
     await prisma.quote.createMany({
       data: mockData.quotes,
     });
     console.log(`   ✓ Created ${mockData.quotes.length} initial quotes`);
-    
+
     // Additional realistic quotes
     await prisma.quote.createMany({
       data: additionalQuotes,
     });
     console.log(`   ✓ Created ${additionalQuotes.length} additional quotes`);
-    
+
     const totalQuotes = mockData.quotes.length + additionalQuotes.length;
     console.log(`   📊 Total quotes: ${totalQuotes}\n`);
 
     // ==================== MESSAGES ====================
     console.log("✉️  Seeding messages...");
-    
-    const adminUser = await prisma.user.findFirst({ 
-      where: { role: "ADMIN" } 
+
+    const adminUser = await prisma.user.findFirst({
+      where: { role: "ADMIN" }
     });
 
     if (!adminUser) {
@@ -74,13 +86,13 @@ async function main() {
         ...mockData.trashMessages,
       ],
     });
-    
-    const totalMessages = 
+
+    const totalMessages =
       mockData.messages.length +
       mockData.sentMessages.length +
       mockData.archivedMessages.length +
       mockData.trashMessages.length;
-    
+
     console.log(`   ✓ Created ${totalMessages} messages`);
     console.log(`   📊 Breakdown:`);
     console.log(`      - Inbox: ${mockData.messages.length}`);
