@@ -4,24 +4,23 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-    Calendar,
-    ChevronUp,
-    Copy,
-    ExternalLink,
-    Eye,
-    Facebook,
-    Loader2,
-    Search,
-    Share2,
-    ShieldCheck,
-    SlidersHorizontal,
-    Sparkles,
-    TrendingUp,
-    Twitter,
-    X
+  Calendar,
+  ChevronUp,
+  Copy,
+  ExternalLink,
+  Eye,
+  Facebook,
+  Loader2,
+  Search,
+  Share2,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sparkles,
+  TrendingUp,
+  Twitter,
+  X
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -46,23 +45,6 @@ const SORT_OPTIONS = [
 ] as const;
 
 const PRODUCTS_PER_PAGE = 9;
-
-// Product Skeleton Loading Component
-function ProductSkeleton() {
-  return (
-    <div className="bg-card border border-border/50 rounded-lg overflow-hidden shadow-sm flex flex-col">
-      <Skeleton className="h-60 w-full" />
-      <div className="p-5 flex flex-col flex-grow space-y-3">
-        <Skeleton className="h-6 w-3/4" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-3 w-1/2" />
-        <Skeleton className="h-4 w-full mt-2" />
-        <Skeleton className="h-10 w-full mt-auto" />
-      </div>
-    </div>
-  );
-}
 
 // Product Quick View Modal
 function ProductQuickView({ product, isOpen, onClose }: { product: Product | null; isOpen: boolean; onClose: () => void }) {

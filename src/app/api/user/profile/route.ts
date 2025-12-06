@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session || !session.user) {
       return NextResponse.json({
         success: false,
@@ -30,7 +30,7 @@ export async function GET() {
       success: true,
       user: user || null,
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({
       success: false,
       user: null,

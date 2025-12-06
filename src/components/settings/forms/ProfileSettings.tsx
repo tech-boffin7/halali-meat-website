@@ -182,7 +182,7 @@ export function ProfileSettings({ user, onUpdate }: ProfileSettingsProps) {
                     height={80} 
                     unoptimized  // Skip Next.js optimization for Cloudinary CDN images
                     className="rounded-full object-cover border-2 border-muted"
-                    onError={(e) => {
+                    onError={() => {
                       // Fallback if image fails to load
                       console.error('Failed to load avatar image:', image);
                     }}
