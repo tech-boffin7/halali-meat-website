@@ -52,18 +52,18 @@ export type MessageCounts = {
   read: number;
   archived: number;
   trash: number;
-  sent: number;
+  drafts: number;
 };
 
 export type QuoteCounts = {
-    total: number;
-    unread: number;
-    read: number;
-    pending: number;
-    processed: number;
-    responded: number;
-    archived: number;
-    trash: number;
+  total: number;
+  unread: number;
+  read: number;
+  pending: number;
+  processed: number;
+  responded: number;
+  archived: number;
+  trash: number;
 };
 
 export type ActionResponse = {

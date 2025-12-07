@@ -4,13 +4,12 @@
 // This file contains server actions for:
 // 1. File Attachments
 // 2. Email Threading  
-// 3. Message Scheduling
+// 3. Message Drafts
 
 import { authOptions } from '@/lib/authOptions';
 import { prisma } from '@/lib/db';
 import { mailOptions, transporter } from '@/lib/nodemailer';
 import { ratelimit } from '@/lib/ratelimit';
-import { MessageStatus } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { headers } from 'next/headers';
 
@@ -76,7 +75,6 @@ export async function sendMessageWithAttachments(
         userId: session.user.id,
         threadId: threadId,
         parentMessageId: messageData.parentMessageId || null,
-        sentAt: new Date(),
         attachments: {
           create: attachments.map(att => ({
             filename: att.filename,
@@ -196,15 +194,15 @@ export async function getMessageThreads(page = 1, limit = 10, search?: string) {
   }
 }
 
-// ==================== MESSAGE SCHEDULING ====================
+// ==================== MESSAGE DRAFTS ====================
 
-export async function scheduleMessage(
+export async function saveDraft(
   messageData: {
     to: string;
     subject: string;
     body: string;
+    parentMessageId?: string;
   },
-  scheduledFor: Date,
   attachments?: Array<{
     filename: string;
     fileUrl: string;
@@ -223,13 +221,17 @@ export async function scheduleMessage(
     return { success: false, message: 'Unauthorized' };
   }
 
-  // Validate scheduledFor is in future
-  const now = new Date();
-  if (new Date(scheduledFor) <= now) {
-    return { success: false, message: 'Scheduled time must be in the future' };
-  }
-
   try {
+    // Determine threading
+    let threadId = null;
+    if (messageData.parentMessageId) {
+      const parentMessage = await prisma.message.findUnique({
+        where: { id: messageData.parentMessageId },
+        select: { threadId: true, id: true }
+      });
+      threadId = parentMessage?.threadId || parentMessage?.id || null;
+    }
+
     const message = await prisma.message.create({
       data: {
         name: session.user.name || 'Admin',
@@ -237,10 +239,11 @@ export async function scheduleMessage(
         subject: messageData.subject,
         body: messageData.body,
         type: 'OUTBOUND',
-        status: MessageStatus.SCHEDULED,
+        status: 'READ',
+        isDraft: true,
         userId: session.user.id,
-        scheduledFor: new Date(scheduledFor),
-        sentAt: null,
+        threadId: threadId,
+        parentMessageId: messageData.parentMessageId || null,
         attachments: attachments ? {
           create: attachments.map(att => ({
             filename: att.filename,
@@ -255,14 +258,14 @@ export async function scheduleMessage(
       }
     });
 
-    return { success: true, message: 'Message scheduled successfully!', data: message };
+    return { success: true, message: 'Draft saved successfully!', data: message };
   } catch (error) {
-    console.error('Error scheduling message:', error);
-    return { success: false, message: 'Failed to schedule message' };
+    console.error('Error saving draft:', error);
+    return { success: false, message: 'Failed to save draft' };
   }
 }
 
-export async function getScheduledMessages() {
+export async function getDrafts() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return { success: false, message: 'Unauthorized', messages: [] };
@@ -271,10 +274,10 @@ export async function getScheduledMessages() {
   try {
     const messages = await prisma.message.findMany({
       where: {
-        status: MessageStatus.SCHEDULED,
+        isDraft: true,
         userId: session.user.id
       },
-      orderBy: { scheduledFor: 'asc' },
+      orderBy: { createdAt: 'desc' },
       include: {
         attachments: true
       }
@@ -282,45 +285,45 @@ export async function getScheduledMessages() {
 
     return { success: true, messages };
   } catch (error) {
-    console.error('Error fetching scheduled messages:', error);
-    return { success: false, message: 'Failed to fetch scheduled messages', messages: [] };
+    console.error('Error fetching drafts:', error);
+    return { success: false, message: 'Failed to fetch drafts', messages: [] };
   }
 }
 
-export async function cancelScheduledMessage(messageId: string) {
+export async function deleteDraft(messageId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return { success: false, message: 'Unauthorized' };
   }
 
   try {
-    // Verify ownership
+    // Verify ownership and draft status
     const message = await prisma.message.findUnique({
       where: { id: messageId },
-      select: { userId: true, status: true }
+      select: { userId: true, isDraft: true }
     });
 
     if (!message || message.userId !== session.user.id) {
-      return { success: false, message: 'Unauthorized or message not found' };
+      return { success: false, message: 'Unauthorized or draft not found' };
     }
 
-    if (message.status !== MessageStatus.SCHEDULED) {
-      return { success: false, message: 'Message is not scheduled' };
+    if (!message.isDraft) {
+      return { success: false, message: 'Message is not a draft' };
     }
 
-    // Delete the scheduled message
+    // Delete the draft
     await prisma.message.delete({
       where: { id: messageId }
     });
 
-    return { success: true, message: 'Scheduled message cancelled' };
+    return { success: true, message: 'Draft deleted successfully' };
   } catch (error) {
-    console.error('Error cancelling scheduled message:', error);
-    return { success: false, message: 'Failed to cancel scheduled message' };
+    console.error('Error deleting draft:', error);
+    return { success: false, message: 'Failed to delete draft' };
   }
 }
 
-export async function sendScheduledMessageNow(messageId: string) {
+export async function sendDraft(messageId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return { success: false, message: 'Unauthorized' };
@@ -333,11 +336,11 @@ export async function sendScheduledMessageNow(messageId: string) {
     });
 
     if (!message || message.userId !== session.user.id) {
-      return { success: false, message: 'Unauthorized or message not found' };
+      return { success: false, message: 'Unauthorized or draft not found' };
     }
 
-    if (message.status !== MessageStatus.SCHEDULED) {
-      return { success: false, message: 'Message is not scheduled' };
+    if (!message.isDraft) {
+      return { success: false, message: 'Message is not a draft' };
     }
 
     // Send email
@@ -352,18 +355,18 @@ export async function sendScheduledMessageNow(messageId: string) {
       }))
     });
 
-    // Update status
+    // Update draft status - mark as sent
     await prisma.message.update({
       where: { id: messageId },
       data: {
-        status: MessageStatus.SENT,
-        sentAt: new Date()
+        isDraft: false,
+        status: 'READ' // Sent outbound messages are marked as READ
       }
     });
 
-    return { success: true, message: 'Message sent successfully!' };
+    return { success: true, message: 'Draft sent successfully!' };
   } catch (error) {
-    console.error('Error sending scheduled message:', error);
-    return { success: false, message: 'Failed to send message' };
+    console.error('Error sending draft:', error);
+    return { success: false, message: 'Failed to send draft' };
   }
 }

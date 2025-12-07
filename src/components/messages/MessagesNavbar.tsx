@@ -5,16 +5,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select';
 import {
-  Sheet, SheetContent,
-  SheetTitle,
-  SheetTrigger
+    Sheet, SheetContent,
+    SheetTitle,
+    SheetTrigger
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils'; // Import cn
 import { Filter, Inbox, MailOpen, Menu, Package, Search, Trash2, X } from 'lucide-react'; // Added MailOpen and Trash2
@@ -29,7 +29,7 @@ export function MessagesNavbar() {
 
   const navItems = [
     { name: 'Inbox', href: '/admin/messages', icon: Inbox, badge: messageCounts.totalInbound, filter: 'ALL' as const },
-    { name: 'Sent', href: '/admin/messages/sent', icon: MailOpen, badge: messageCounts.sent, filter: 'SENT' as const },
+    { name: 'Drafts', href: '/admin/messages/drafts', icon: MailOpen, badge: messageCounts.drafts, filter: 'DRAFTS' as const },
     { name: 'Archived', href: '/admin/messages/archived', icon: Package, badge: messageCounts.archived, filter: 'ARCHIVED' as const },
     { name: 'Trash', href: '/admin/messages/trash', icon: Trash2, badge: messageCounts.trash, filter: 'TRASH' as const },
   ];

@@ -1,30 +1,29 @@
-import { MessageStatus, MessageType } from '@prisma/client';
+import { MessageType } from '@prisma/client';
 
 export { MessageType };
 
 // Extended Message type with new fields
-export interface Message {
+export type Message = {
   id: string;
   name: string;
   email: string;
   subject: string;
   body: string;
-  status: MessageStatus;
-  type: MessageType;
+  status: 'UNREAD' | 'READ' | 'ARCHIVED' | 'TRASH';
+  type: 'INBOUND' | 'OUTBOUND';
+  isDraft: boolean;
   createdAt: Date;
-  userId: string | null;
-  
-  // NEW: Threading
+  userId?: string | null;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+  } | null;
   threadId?: string | null;
   parentMessageId?: string | null;
-  
-  // NEW: Scheduling
-  scheduledFor?: Date | null;
-  sentAt?: Date | null;
-  
-  // NEW: Attachments
   attachments?: Attachment[];
-}
+};
 
 export interface Attachment {
   id: string;

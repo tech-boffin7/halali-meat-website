@@ -89,6 +89,7 @@ model Message {
   body      String
   status    MessageStatus @default(UNREAD)
   type      MessageType @default(INBOUND)
+  isDraft   Boolean  @default(false)
   createdAt DateTime @default(now())
   userId    String?  @db.ObjectId
   user      User?    @relation(fields: [userId], references: [id])
@@ -99,18 +100,14 @@ model Message {
   parentMessage Message?  @relation("MessageThread", fields: [parentMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   replies       Message[] @relation("MessageThread")
   
-  // Scheduling: Send messages at future time
-  scheduledFor  DateTime?
-  sentAt        DateTime?
-  
   // Attachments: File uploads
   attachments   Attachment[]
   
   @@index([type, status])
   @@index([threadId])
   @@index([createdAt])
-  @@index([scheduledFor])
   @@index([status, type])
+  @@index([isDraft])
 }
 
 model Attachment {
@@ -143,8 +140,6 @@ enum MessageStatus {
   READ
   ARCHIVED
   TRASH
-  SCHEDULED  // For scheduled messages not yet sent
-  SENT       // For successfully sent scheduled messages
 }
 
 enum MessageType {

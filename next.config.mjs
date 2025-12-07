@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
@@ -13,7 +11,6 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      // Added remote patterns from the provided Code Edit
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',

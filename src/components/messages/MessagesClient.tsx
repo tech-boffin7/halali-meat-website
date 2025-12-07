@@ -90,7 +90,7 @@ export function MessagesClient() {
         // Export ALL matching current filters from server
         const { getAllMessagesForExport, getAllSentMessagesForExport } = await import('@/app/actions/message-actions');
         
-        const result = statusFilter === 'SENT'
+        const result = statusFilter === 'DRAFTS'
           ? await getAllSentMessagesForExport(sortBy, searchQuery, undefined, dateRange.from, dateRange.to)
           : await getAllMessagesForExport(statusFilter, sortBy, searchQuery, dateRange.from, dateRange.to);
         
@@ -121,8 +121,8 @@ export function MessagesClient() {
 
   const folderDetails = useMemo(() => {
     switch (statusFilter) {
-      case 'SENT':
-        return { name: 'Sent', count: messageCounts.sent };
+      case 'DRAFTS':
+        return { name: 'Drafts', count: messageCounts.drafts };
       case 'ARCHIVED':
         return { name: 'Archived', count: messageCounts.archived };
       case 'TRASH':

@@ -52,9 +52,9 @@ export function MessagesSidebar() {
               }`}
             >
               <Send className="h-4 w-4" />
-              Sent
-              <Badge id="sent-messages-badge" className="text-xs ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                {messageCounts.sent}
+              Drafts
+              <Badge id="drafts-messages-badge" className="text-xs ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                {messageCounts.drafts}
               </Badge>
             </Link>
             <Link

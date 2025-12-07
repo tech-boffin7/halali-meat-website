@@ -3,6 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import { getServerSession } from "next-auth";
 import { NextResponse } from 'next/server';
 
+// Force dynamic rendering because we use getServerSession which reads headers
+export const dynamic = 'force-dynamic';
+
 const prisma = new PrismaClient();
 
 export async function GET() {

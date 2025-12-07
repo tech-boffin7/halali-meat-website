@@ -1,6 +1,6 @@
 'use client';
 
-import { getMessageBadgeCounts, getMessagesAction, getSentMessagesAction, updateMessageStatus, updateMultipleMessageStatus } from '@/app/actions/message-actions';
+import { getMessageBadgeCounts, getMessagesAction, updateMessageStatus, updateMultipleMessageStatus } from '@/app/actions/message-actions';
 import { Message, MessageType } from '@/components/messages/types';
 import { ActionResponse, MessageCounts } from '@/lib/definitions';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -30,10 +30,10 @@ interface MessagesContextType {
 const MessagesContext = createContext<MessagesContextType | undefined>(undefined);
 
 const calculateTotal = (counts: MessageCounts) => {
-  return counts.totalInbound + counts.sent + counts.archived + counts.trash;
+  return counts.totalInbound + counts.drafts + counts.archived + counts.trash;
 };
 
-export type MessageStatusFilter = 'ALL' | 'UNREAD' | 'READ' | 'ARCHIVED' | 'TRASH' | 'SENT';
+export type MessageStatusFilter = 'ALL' | 'UNREAD' | 'READ' | 'ARCHIVED' | 'TRASH' | 'DRAFTS';
 
 export function MessagesProvider({ children, initialMessages, initialStatusFilter }: { children: ReactNode; initialMessages?: Message[]; initialStatusFilter?: MessageStatusFilter }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages || []);
@@ -47,7 +47,7 @@ export function MessagesProvider({ children, initialMessages, initialStatusFilte
     read: 0,
     archived: 0,
     trash: 0,
-    sent: 0,
+    drafts: 0,
   });
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,8 +63,10 @@ export function MessagesProvider({ children, initialMessages, initialStatusFilte
     setIsLoading(true);
     try {
       let response: ActionResponse;
-      if (statusFilter === 'SENT') {
-        response = await getSentMessagesAction(pageNum, MESSAGES_PER_PAGE, sortBy, debouncedSearchQuery, undefined, dateRange.from, dateRange.to);
+      if (statusFilter === 'DRAFTS') {
+        // Drafts are handled separately, not through getSentMessagesAction
+        // For now, skip fetching as drafts page handles its own data
+        response = { success: true, messages: [], counts: messageCounts };
       } else {
         response = await getMessagesAction(pageNum, MESSAGES_PER_PAGE, statusFilter, sortBy, debouncedSearchQuery, dateRange.from, dateRange.to);
       }

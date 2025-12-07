@@ -1,33 +1,31 @@
 import { sendComposedMessage } from '@/app/actions/message-actions';
-import { scheduleMessage } from '@/app/actions/message-advanced-actions';
+import { saveDraft } from '@/app/actions/message-advanced-actions';
 import { ReplyTemplateSelector } from '@/components/quotes/ReplyTemplateSelector';
 import { Button } from '@/components/ui/button';
 import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ActionResponse, composeMessageSchema } from '@/lib/definitions';
+import { composeMessageSchema } from '@/lib/definitions';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { CalendarClock, X } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { SchedulePicker } from './SchedulePicker';
 
 type ComposeMessageFormValues = z.infer<typeof composeMessageSchema>;
 
 export function ComposeDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [scheduledDate, setScheduledDate] = useState<Date | null>(null);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
 
   const form = useForm<ComposeMessageFormValues>({
     resolver: zodResolver(composeMessageSchema),
@@ -41,45 +39,22 @@ export function ComposeDialog({ open, onOpenChange }: { open: boolean, onOpenCha
   const onSubmit = async (data: ComposeMessageFormValues) => {
     setIsLoading(true);
     try {
-      let result: ActionResponse;
-
-      if (scheduledDate) {
-        // Handle scheduled message
-        const scheduleResult = await scheduleMessage(
-            {
-                to: data.to,
-                subject: data.subject,
-                body: data.body
-            },
-            scheduledDate
-        );
-        
-        // Map scheduleResult to ActionResponse format
-        result = {
-            success: scheduleResult.success,
-            message: scheduleResult.message,
-            // @ts-expect-error - data property might not exist on ActionResponse but we handle it
-            data: scheduleResult.data
-        };
-      } else {
-        // Handle immediate send
-        const formData = new FormData();
-        formData.append('to', data.to);
-        formData.append('subject', data.subject);
-        formData.append('body', data.body);
-        result = await sendComposedMessage(formData);
-      }
+      const formData = new FormData();
+      formData.append('to', data.to);
+      formData.append('subject', data.subject);
+      formData.append('body', data.body);
+      const result = await sendComposedMessage(formData);
 
       if (result.success) {
         toast.success(result.message);
         onOpenChange(false);
         form.reset();
-        setScheduledDate(null);
       } else {
         toast.error(result.message || 'Failed to send message.');
         if (result.errors) {
-          for (const field in result.errors) {
-            form.setError(field as keyof ComposeMessageFormValues, { message: result.errors[field]?.[0] });
+          const errors = result.errors as Record<string, string[]>;
+          for (const field in errors) {
+            form.setError(field as keyof ComposeMessageFormValues, { message: errors[field]?.[0] });
           }
         }
       }
@@ -88,6 +63,38 @@ export function ComposeDialog({ open, onOpenChange }: { open: boolean, onOpenCha
       toast.error('An unexpected error occurred.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    const data = form.getValues();
+    
+    // Basic validation - at least have recipient and some content
+    if (!data.to || (!data.subject && !data.body)) {
+      toast.error('Please add recipient and some content before saving draft');
+      return;
+    }
+
+    setIsSavingDraft(true);
+    try {
+      const result = await saveDraft({
+        to: data.to,
+        subject: data.subject || '(No subject)',
+        body: data.body || '',
+      });
+
+      if (result.success) {
+        toast.success('Draft saved successfully!');
+        onOpenChange(false);
+        form.reset();
+      } else {
+        toast.error(result.message || 'Failed to save draft');
+      }
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      toast.error('An unexpected error occurred.');
+    } finally {
+      setIsSavingDraft(false);
     }
   };
 
@@ -145,41 +152,36 @@ export function ComposeDialog({ open, onOpenChange }: { open: boolean, onOpenCha
                 <p className="text-sm text-red-500">{form.formState.errors.body.message}</p>
               )}
             </div>
-            
-            {/* Scheduled Date Indicator */}
-            {scheduledDate && (
-                <div className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-2 rounded-md text-sm">
-                    <CalendarClock className="h-4 w-4" />
-                    <span>Scheduled for: {format(scheduledDate, 'MMM d, yyyy h:mm a')}</span>
-                    <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-6 w-6 ml-auto hover:bg-primary/20"
-                        onClick={() => setScheduledDate(null)}
-                    >
-                        <X className="h-3 w-3" />
-                    </Button>
-                </div>
-            )}
 
             <DialogFooter className="flex justify-between sm:justify-between items-center w-full sticky bottom-0 bg-background border-t md:static md:border-0 p-4 sm:p-6 mt-0 -mx-6 -mb-6">
               <div className="flex gap-2">
-                 <SchedulePicker onSchedule={setScheduledDate}>
-                    <Button type="button" variant="outline" size="sm" className="gap-2 h-11 md:h-9" data-tooltip="Schedule Send">
-                        <CalendarClock className="h-4 w-4" />
-                        <span>Schedule Message</span>
-                    </Button>
-                 </SchedulePicker>
+                 <Tooltip>
+                   <TooltipTrigger asChild>
+                     <Button 
+                       type="button" 
+                       variant="outline" 
+                       size="sm" 
+                       className="gap-2 h-11 md:h-9" 
+                       onClick={handleSaveDraft}
+                       disabled={isSavingDraft}
+                     >
+                         <Save className="h-4 w-4" />
+                         <span>{isSavingDraft ? 'Saving...' : 'Save Draft'}</span>
+                     </Button>
+                   </TooltipTrigger>
+                   <TooltipContent>
+                     <p>Save message as draft to send later</p>
+                   </TooltipContent>
+                 </Tooltip>
               </div>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button type="submit" disabled={isLoading} className="h-11 md:h-9 px-6 md:px-4">
-                    {isLoading ? 'Processing...' : (scheduledDate ? 'Schedule' : 'Send')}
+                    {isLoading ? 'Sending...' : 'Send'}
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{scheduledDate ? 'Schedule message' : 'Send message'}</p>
+                  <p>Send message now</p>
                 </TooltipContent>
               </Tooltip>
             </DialogFooter>

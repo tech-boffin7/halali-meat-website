@@ -1,9 +1,0 @@
-[build]
-  command = "npm run build"
-  publish = ".next"
-
-[build.environment]
-  # Tell Netlify's secrets scanner to skip these keys - they are safely stored in environment variables
-  # and only used server-side, not exposed to client
-  # Note: CLOUDINARY_CLOUD_NAME is public (appears in CDN URLs) so it's safe to omit
-  SECRETS_SCAN_OMIT_KEYS = "NEXTAUTH_SECRET,CLOUDINARY_API_SECRET,CLOUDINARY_API_KEY,CLOUDINARY_CLOUD_NAME,EMAIL_PASSWORD,UPSTASH_REDIS_REST_TOKEN,UPSTASH_REDIS_REST_URL,APP_URL,CRON_SECRET,ENCRYPTION_SECRET"

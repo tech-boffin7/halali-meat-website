@@ -89,7 +89,7 @@ export async function getProducts(
       // Validate field and order
       const validFields = ['createdAt', 'updatedAt', 'name', 'price'];
       const validOrders = ['asc', 'desc'];
-      
+
       if (validFields.includes(field) && validOrders.includes(order)) {
         // Dynamic key assignment requires careful typing or casting for Prisma
         (orderBy as any)[field] = order;
@@ -288,12 +288,11 @@ export async function getContactMessages(page = 1, limit = 10, status?: string, 
         body: true,
         status: true,
         type: true,
+        isDraft: true,
         createdAt: true,
         attachments: true,
         threadId: true,
         parentMessageId: true,
-        scheduledFor: true,
-        sentAt: true,
       },
     };
 
